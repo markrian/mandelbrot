@@ -2,7 +2,7 @@
     var canvas;
     var ctx;
     var imageData;
-    var maxIterations = 5;
+    var maxIterations = 75;
     let lastCount = 0;
 
     function onLoad() {
@@ -10,9 +10,6 @@
         createImageData();
         drawImageData();
         setupMouseListener();
-        setTimeout(function () {
-            location.reload(true);
-        }, 250);
     }
 
     function createCanvasAndContext() {
@@ -91,7 +88,7 @@
         var r = coords[0];
         var i = coords[1];
 
-        var xRange = 10;
+        var xRange = 4;
 
         // scaling first; width is 4 units
         var scale = canvas.width / xRange;

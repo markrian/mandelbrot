@@ -8,8 +8,12 @@
     var zoom = 1;
 
     function init() {
+        readLocationHash();
+        setupHashListener();
+        setSlider();
         createCanvasAndContext();
         setupMouseListener();
+        setupSliderListener();
         setupZoomInteraction();
         draw();
     }
@@ -17,6 +21,7 @@
     function draw() {
         createImageData();
         drawImageData();
+        setLocationHash();
     }
 
     function createCanvasAndContext() {
@@ -57,10 +62,18 @@
         });
     }
 
+    function setupSliderListener() {
+        var slider = document.getElementById('iterations');
+        slider.addEventListener('change', function () {
+            maxIterations = slider.value;
+            draw();
+        });
+    }
+
     function setupZoomInteraction() {
         document.addEventListener('wheel', function (event) {
             centre = coordsToComplex([event.pageX, event.pageY], centre, zoom);
-            zoom = event.deltaY > 0 ? zoom*2 : zoom/2;
+            zoom = event.deltaY < 0 ? zoom*2 : zoom/2;
             draw();
         });
     }
@@ -141,6 +154,35 @@
     function log(...data) {
         var el = document.getElementById('log');
         el.textContent = data;
+    }
+
+    function setLocationHash() {
+        location.hash = centre.concat([zoom, maxIterations]);
+    }
+
+    function readLocationHash() {
+        var hash = location.hash.slice(1);
+        if (hash === '') {
+            return;
+        }
+
+        var parts = hash.split(',');
+        centre[0] = parseFloat(parts[0]);
+        centre[1] = parseFloat(parts[1]);
+        zoom = parseFloat(parts[2]);
+        maxIterations = parseFloat(parts[3]);
+    }
+
+    function setSlider() {
+        var slider = document.getElementById('iterations');
+        slider.value = maxIterations;
+    }
+
+    function setupHashListener() {
+        window.addEventListener('hashchange', function () {
+            readLocationHash();
+            draw();
+        });
     }
 
     document.addEventListener('DOMContentLoaded', init);

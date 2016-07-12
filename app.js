@@ -118,7 +118,7 @@
 
         var xRange = 4 / zoom;
 
-        // scaling first; width is 4 units
+        // scaling first
         var scale = canvas.width / xRange;
         r /= scale;
         i /= scale;

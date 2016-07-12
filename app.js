@@ -4,12 +4,19 @@
     var imageData;
     var maxIterations = 75;
     let lastCount = 0;
+    var centre = [0, 0];
+    var zoom = 1;
 
-    function onLoad() {
+    function init() {
         createCanvasAndContext();
+        setupMouseListener();
+        setupZoomInteraction();
+        draw();
+    }
+
+    function draw() {
         createImageData();
         drawImageData();
-        setupMouseListener();
     }
 
     function createCanvasAndContext() {
@@ -26,7 +33,7 @@
         for (var i = 0; i < imageData.data.length; i += 4) {
             y = Math.round(i / (imageData.width*4));
             x = (i / 4) % imageData.width;
-            var complex = coordsToComplex([x, y]);
+            var complex = coordsToComplex([x, y], centre, zoom);
             var count = mandelbrot(complex, maxIterations);
             if (count === maxIterations) {
                 rgb = [0,0,0];
@@ -44,9 +51,17 @@
         document.addEventListener('click', function (event) {
             var x = event.pageX;
             var y = event.pageY;
-            var complex = coordsToComplex([x, y]);
+            var complex = coordsToComplex([x, y], centre, zoom);
             var count = mandelbrot(complex, maxIterations);
             log(complex, count);
+        });
+    }
+
+    function setupZoomInteraction() {
+        document.addEventListener('wheel', function (event) {
+            centre = coordsToComplex([event.pageX, event.pageY], centre, zoom);
+            zoom = event.deltaY > 0 ? zoom*2 : zoom/2;
+            draw();
         });
     }
 
@@ -84,11 +99,11 @@
         return hslToRgb(h, 0.8, 0.4);
     }
 
-    function coordsToComplex(coords) {
+    function coordsToComplex(coords, centre, zoom) {
         var r = coords[0];
         var i = coords[1];
 
-        var xRange = 4;
+        var xRange = 4 / zoom;
 
         // scaling first; width is 4 units
         var scale = canvas.width / xRange;
@@ -97,8 +112,8 @@
 
         // now translate
         var yRange = canvas.height / scale;
-        r = r - xRange/2;
-        i = (yRange/2) - i;
+        r = centre[0] + r - xRange/2;
+        i = centre[1] + (yRange/2) - i;
 
         return [r, i];
     }
@@ -128,5 +143,5 @@
         el.textContent = data;
     }
 
-    document.addEventListener('DOMContentLoaded', onLoad);
+    document.addEventListener('DOMContentLoaded', init);
 })();

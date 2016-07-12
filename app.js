@@ -3,13 +3,13 @@
     var ctx;
     var imageData;
     var maxIterations = 5;
-    let dirty = true;
     let lastCount = 0;
 
     function onLoad() {
         createCanvasAndContext();
         createImageData();
         drawImageData();
+        setupMouseListener();
         setTimeout(function () {
             location.reload(true);
         }, 250);
@@ -43,41 +43,18 @@
         }
     }
 
-    function setupMoveListener() {
-        document.addEventListener('mousemove', function (event) {
+    function setupMouseListener() {
+        document.addEventListener('click', function (event) {
             var x = event.pageX;
             var y = event.pageY;
-            var rgb;
-
             var complex = coordsToComplex([x, y]);
             var count = mandelbrot(complex, maxIterations);
-            if (count === maxIterations) {
-                rgb = [0,0,0];
-            } else {
-                rgb = countToRGB(count, maxIterations);
-            }
-
-            var i = (x + y*imageData.width)*4;
-            imageData.data[i] = rgb[0];
-            imageData.data[i+1] = rgb[1];
-            imageData.data[i+2] = rgb[2];
-            imageData.data[i+3] = 255;
-
-            dirty = true;
-            lastCount = (lastCount + 1) % maxIterations;
+            log(complex, count);
         });
     }
 
-    function loop() {
-        drawImageData();
-        requestAnimationFrame(loop);
-    }
-
     function drawImageData() {
-        if (dirty) {
-            ctx.putImageData(imageData, 0, 0);
-            dirty = false;
-        }
+        ctx.putImageData(imageData, 0, 0);
     }
 
     function hslToRgb(h, s, l) {
@@ -114,14 +91,16 @@
         var r = coords[0];
         var i = coords[1];
 
+        var xRange = 10;
+
         // scaling first; width is 4 units
-        var scale = canvas.width / 4;
+        var scale = canvas.width / xRange;
         r /= scale;
         i /= scale;
 
         // now translate
         var yRange = canvas.height / scale;
-        r = r - 2;
+        r = r - xRange/2;
         i = (yRange/2) - i;
 
         return [r, i];
@@ -132,14 +111,24 @@
         var zr = 0;
         var zi = 0;
         var zmod = 0;
-        while (count < max && zmod < 4) {
-            zr = zr*zr - zi*zi + complex[0];
-            zi = 2*zr*zi + complex[1];
+        var zr_temp;
+        var zi_temp;
+        while (count < max) {
+            zr_temp = zr*zr - zi*zi + complex[0];
+            zi_temp = 2*zr*zi + complex[1];
+            zr = zr_temp;
+            zi = zi_temp;
             zmod = zr*zr + zi*zi;
+            if (zmod > 4) return count
             count += 1;
         }
 
         return count;
+    }
+
+    function log(...data) {
+        var el = document.getElementById('log');
+        el.textContent = data;
     }
 
     document.addEventListener('DOMContentLoaded', onLoad);

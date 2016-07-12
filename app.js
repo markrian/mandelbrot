@@ -2,15 +2,17 @@
     var canvas;
     var ctx;
     var imageData;
-    var maxIterations = 100;
+    var maxIterations = 5;
     let dirty = true;
     let lastCount = 0;
 
     function onLoad() {
         createCanvasAndContext();
         createImageData();
-        setupMoveListener();
-        loop();
+        drawImageData();
+        setTimeout(function () {
+            location.reload(true);
+        }, 250);
     }
 
     function createCanvasAndContext() {
@@ -23,6 +25,22 @@
 
     function createImageData() {
         imageData = ctx.createImageData(canvas.width, canvas.height);
+        var x, y, count;
+        for (var i = 0; i < imageData.data.length; i += 4) {
+            y = Math.round(i / (imageData.width*4));
+            x = (i / 4) % imageData.width;
+            var complex = coordsToComplex([x, y]);
+            var count = mandelbrot(complex, maxIterations);
+            if (count === maxIterations) {
+                rgb = [0,0,0];
+            } else {
+                rgb = countToRGB(count, maxIterations);
+            }
+            imageData.data[i] = rgb[0];
+            imageData.data[i+1] = rgb[1];
+            imageData.data[i+2] = rgb[2];
+            imageData.data[i+3] = 255;
+        }
     }
 
     function setupMoveListener() {
@@ -116,7 +134,7 @@
         var zmod = 0;
         while (count < max && zmod < 4) {
             zr = zr*zr - zi*zi + complex[0];
-            zi = zr*zi + zi*zr + complex[1];
+            zi = 2*zr*zi + complex[1];
             zmod = zr*zr + zi*zi;
             count += 1;
         }

@@ -1,0 +1,19 @@
+{
+  "name": "mandelbrot",
+  "version": "1.0.0",
+  "description": "A simple Mandelbrot set viewer",
+  "main": "app.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markrian/mandelbrot.git"
+  },
+  "keywords": [],
+  "author": "Mark Florian <markrian@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^2.3.3"
+  }
+}

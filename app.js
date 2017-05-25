@@ -136,19 +136,18 @@ function mandelbrot(complex, max) {
     var zr = 0;
     var zi = 0;
     var zmod = 0;
-    var zr_temp;
-    var zi_temp;
     while (count < max) {
-        zr_temp = zr * zr - zi * zi + complex[0];
-        zi_temp = 2 * zr * zi + complex[1];
-        zr = zr_temp;
-        zi = zi_temp;
+        _a = [
+            zr * zr - zi * zi + complex[0],
+            2 * zr * zi + complex[1],
+        ], zr = _a[0], zi = _a[1];
         zmod = zr * zr + zi * zi;
         if (zmod > 4)
             return count;
         count += 1;
     }
     return count;
+    var _a;
 }
 function log(string) {
     var el = $('#log');

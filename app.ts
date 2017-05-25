@@ -152,13 +152,11 @@ function mandelbrot(complex: Point, max: number) {
     let zr = 0;
     let zi = 0;
     let zmod = 0;
-    let zr_temp;
-    let zi_temp;
     while (count < max) {
-        zr_temp = zr * zr - zi * zi + complex[0];
-        zi_temp = 2 * zr * zi + complex[1];
-        zr = zr_temp;
-        zi = zi_temp;
+        [zr, zi] = [
+            zr * zr - zi * zi + complex[0],
+            2 * zr * zi + complex[1],
+        ];
         zmod = zr * zr + zi * zi;
         if (zmod > 4) return count
         count += 1;

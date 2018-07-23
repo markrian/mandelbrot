@@ -132,6 +132,7 @@ function coordsToComplex(coords, centre, zoom) {
     return [r, i];
 }
 function mandelbrot(complex, max) {
+    var _a;
     var count = 0;
     var zr = 0;
     var zi = 0;
@@ -147,7 +148,6 @@ function mandelbrot(complex, max) {
         count += 1;
     }
     return count;
-    var _a;
 }
 function log(string) {
     var el = $('#log');

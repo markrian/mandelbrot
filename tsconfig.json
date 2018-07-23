@@ -5,7 +5,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "none",
-    "outFile": "./app.js",
+    "outDir": "dist",
     "strict": true
   }
 }

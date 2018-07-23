@@ -5,7 +5,7 @@
   "description": "A simple Mandelbrot set viewer",
   "main": "app.js",
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf dist && tsc && cp index.html dist"
   },
   "repository": {
     "type": "git",

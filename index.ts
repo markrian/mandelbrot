@@ -2,9 +2,17 @@ interface RowJob {
     row: number;
 }
 
-interface CompletedRowJob {
-    imageData: ImageData;
-    row: number;
+interface PendingRowJob extends RowJob {
+    id: number;
+}
+
+interface CompletedRowJob extends PendingRowJob {
+    counts: number[];
+}
+
+interface WorkerMessageEvent extends MessageEvent {
+    target: Worker;
+    data: CompletedRowJob;
 }
 
 type Coords = {
@@ -37,8 +45,8 @@ function coordsToComplex(coords: Coords, centre: Complex, zoom: number, width: n
     return complex(real, imag);
 }
 
-function sortByFurthestFrom(n) {
-    return function doSortByFurthestFrom(a, b) {
+function sortByFurthestFrom(n: number) {
+    return function doSortByFurthestFrom(a: number, b: number) {
         a = Math.abs(a - n);
         b = Math.abs(b - n);
         return a < b ? 1 : -1;
@@ -60,7 +68,7 @@ class MandelbrotRenderer {
         this.workerPool = new WorkerPool(this.onMessage.bind(this), 'worker.js', workerPoolSize)
     }
 
-    onMessage(event: MessageEvent) {
+    onMessage(event: WorkerMessageEvent) {
     }
 
     rowReceived(rowJob: CompletedRowJob) {
@@ -88,11 +96,16 @@ class WorkerPool {
     private workers: Worker[] = [];
 
     constructor(
-        private onMessage: (e: MessageEvent) => void,
+        private onMessage: (e: WorkerMessageEvent) => void,
         url: string,
         size: number,
     ) {
-        while (size--) this.workers.push(new Worker(url));
+        const boundOnMessage = this.onMessage.bind(this);
+        while (size--) {
+            const worker = new Worker(url);
+            worker.onmessage = boundOnMessage;
+            this.workers.push(worker);
+        }
     }
 
     addJobs(...jobs: RowJob[]) {
@@ -108,14 +121,22 @@ class WorkerPool {
         this.jobsId++;
     }
 
-    private doOnMessage(event: MessageEvent) {
+    private doOnMessage(event: WorkerMessageEvent) {
+        // check if message is for current jobsId; ignore if not
         // check if worker is idle:
         // if so, send it another job, if any left
         this.onMessage(event);
+        if (this.jobs.length > 0) {
+            const worker = <Worker>event.target;
+            worker.postMessage(this.jobs.pop());
+        }
     }
 
     private start() {
-
+        for (const worker of this.workers) {
+            if (this.jobs.length === 0) break;
+            worker.postMessage(this.jobs.pop());
+        }
     }
 
     private addJob(job: RowJob) {

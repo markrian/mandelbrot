@@ -56,7 +56,7 @@ function sortByFurthestFrom(n: number) {
 class MandelbrotRenderer {
     private ctx: CanvasRenderingContext2D;
     private workerPool: WorkerPool;
-    private rowImageData: ImageData;
+    private imageData: ImageData;
     private width = 100;
     private height = 100;
 
@@ -65,14 +65,12 @@ class MandelbrotRenderer {
         workerPoolSize: number,
     ) {
         this.ctx = canvas.getContext('2d');
-        this.workerPool = new WorkerPool(this.onMessage.bind(this), 'worker.js', workerPoolSize)
+        this.workerPool = new WorkerPool(this.drawRow.bind(this), 'worker.js', workerPoolSize)
     }
 
-    onMessage(event: WorkerMessageEvent) {
-    }
-
-    rowReceived(rowJob: CompletedRowJob) {
-        this.ctx.putImageData(rowJob.imageData, 0, rowJob.row)
+    drawRow(rowJob: CompletedRowJob) {
+        this.writeImageData(rowJob.counts);
+        this.ctx.putImageData(this.imageData, 0, rowJob.row)
     }
 
     redraw(centre: Point, zoom: number) {
@@ -86,7 +84,27 @@ class MandelbrotRenderer {
     onResize() {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
-        this.rowImageData = this.ctx.createImageData(this.width, this.height);
+        this.imageData = this.ctx.createImageData(this.width, this.height);
+    }
+    
+    writeImageData(counts: number[]) {
+        const { imageData } = this;
+        let x, y, count, rgb;
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            y = Math.round(i / (imageData.width * 4));
+            x = (i / 4) % imageData.width;
+            const complex = coordsToComplex([x, y], centre, zoom);
+            count = mandelbrot(complex, maxIterations);
+            if (count === maxIterations) {
+                rgb = [0, 0, 0];
+            } else {
+                rgb = countToRGB(count, maxIterations);
+            }
+            imageData.data[i] = rgb[0];
+            imageData.data[i + 1] = rgb[1];
+            imageData.data[i + 2] = rgb[2];
+            imageData.data[i + 3] = 255;
+        }
     }
 }
 
@@ -100,7 +118,7 @@ class WorkerPool {
         url: string,
         size: number,
     ) {
-        const boundOnMessage = this.onMessage.bind(this);
+        const boundOnMessage = this.doOnMessage.bind(this);
         while (size--) {
             const worker = new Worker(url);
             worker.onmessage = boundOnMessage;
@@ -108,27 +126,26 @@ class WorkerPool {
         }
     }
 
-    addJobs(...jobs: RowJob[]) {
-        this.clearJobs();
+    run(...jobs: RowJob[]) {
+        this.stop();
         for (const job of jobs) {
             this.addJob(job);
         }
         this.start();
     }
 
-    clearJobs() {
+    private stop() {
         while (this.jobs.length) this.jobs.pop();
         this.jobsId++;
     }
 
     private doOnMessage(event: WorkerMessageEvent) {
-        // check if message is for current jobsId; ignore if not
+        if (event.data.id !== this.jobsId) return;
         // check if worker is idle:
         // if so, send it another job, if any left
         this.onMessage(event);
         if (this.jobs.length > 0) {
-            const worker = <Worker>event.target;
-            worker.postMessage(this.jobs.pop());
+            event.target.postMessage(this.jobs.pop());
         }
     }
 

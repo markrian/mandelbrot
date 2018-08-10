@@ -8,6 +8,15 @@ import {
     ToWorkerMessageEvent,
 } from './interfaces';
 
+function middleOnesLast(length: number) {
+    const middle = Math.floor(length / 2);
+    return function (a: number, b: number) {
+        a = Math.abs(a - middle);
+        b = Math.abs(b - middle);
+        return a < b ? 1 : -1;
+    }
+}
+
 function coordsToComplex(coords: Coords, centre: Complex, zoom: number, width: number, height: number): Complex {
     let { x: real, y: imag } = coords;
 
@@ -68,15 +77,24 @@ class MandelbrotRenderer {
     }
 
     redraw() {
-        this.workerPool.run({
-            row: 150,
+        this.log('redrawing');
+        this.workerPool.run(...this.rowsIndices().map(row => ({
+            row,
             realMin: -1,
             realMax: 1,
             iterations: 10,
             imag: .5,
             width: this.width,
-        })
-        this.log('redrawing');
+        })));
+    }
+
+    private rowsIndices() {
+        const rows: number[] = [];
+        for (let i = 0; i < this.height; i++) {
+            rows.push(i);
+        }
+        rows.sort(middleOnesLast(this.height));
+        return rows;
     }
 
     onResize() {

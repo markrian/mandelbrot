@@ -4,7 +4,10 @@ import {
     CompletedRowJob,
 } from '../interfaces';
 
+console.log('worker initialising');
+
 function receiveJob(event: ToWorkerMessageEvent): void {
+    console.log('worker received message', event);
     const rowJob = event.data;
     const counts: number[] = [];
 
@@ -19,7 +22,7 @@ function receiveJob(event: ToWorkerMessageEvent): void {
         counts,
     };
 
-    postMessage(rowJob);
+    postMessage(completedRowJob);
 }
 
 function mandelbrot(complex: Complex, max: number): number {

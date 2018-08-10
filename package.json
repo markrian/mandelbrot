@@ -15,6 +15,6 @@
   "author": "Mark Florian <markrian@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^2.3.3"
+    "typescript": "^3.0.1"
   }
 }

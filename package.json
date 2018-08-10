@@ -5,7 +5,7 @@
   "description": "A simple Mandelbrot set viewer",
   "main": "app.js",
   "scripts": {
-    "build": "rm -rf dist && tsc --build tsconfig-worker.json  && cp index.html dist"
+    "build": "rm -rf dist && tsc --build tsconfig.json worker/tsconfig.json && cp index.html dist"
   },
   "repository": {
     "type": "git",

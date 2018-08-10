@@ -9,7 +9,7 @@ function receiveJob(event: ToWorkerMessageEvent): void {
     const counts: number[] = [];
 
     for (let x = 0; x < rowJob.width; x++) {
-        const real = rowJob.realMin + (x / rowJob.width)*(rowJob.realMax - rowJob.realMin);
+        const real = rowJob.realMin + (x / rowJob.width) * (rowJob.realMax - rowJob.realMin);
         counts.push(mandelbrot({ real, imag: rowJob.imag }, rowJob.iterations));
     }
 

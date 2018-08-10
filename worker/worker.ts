@@ -2,7 +2,7 @@ import {
     ToWorkerMessageEvent,
     Complex,
     CompletedRowJob,
-} from './index';
+} from '../interfaces';
 
 function receiveJob(event: ToWorkerMessageEvent): void {
     const rowJob = event.data;

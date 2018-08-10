@@ -1,38 +1,12 @@
-interface RowJob {
-    row: number;
-    realMin: number;
-    realMax: number;
-    iterations: number;
-    imag: number;
-    width: number;
-}
-
-interface PendingRowJob extends RowJob {
-    id: number;
-}
-
-export interface CompletedRowJob extends PendingRowJob {
-    counts: number[];
-}
-
-interface FromWorkerMessageEvent extends MessageEvent {
-    target: Worker;
-    data: CompletedRowJob;
-}
-
-export interface ToWorkerMessageEvent extends MessageEvent {
-    data: PendingRowJob;
-}
-
-type Coords = {
-    x: number;
-    y: number;
-}
-
-export type Complex = {
-    real: number;
-    imag: number;
-}
+import {
+    Coords,
+    Complex,
+    ToWorkerMessageEvent,
+    FromWorkerMessageEvent,
+    RowJob,
+    PendingRowJob,
+    CompletedRowJob,
+} from './interfaces';
 
 function coordsToComplex(coords: Coords, centre: Complex, zoom: number, width: number, height: number): Complex {
     let { x: real, y: imag } = coords;
@@ -106,7 +80,7 @@ class MandelbrotRenderer {
             y = Math.round(i / (imageData.width * 4));
             x = (i / 4) % imageData.width;
             const complex = coordsToComplex({ x, y }, this.centre, this.zoom, this.width, this.height);
-            count = mandelbrot(complex, this.iterations);
+            count = counts[i];
             if (count === this.iterations) {
                 rgb = [0, 0, 0];
             } else {

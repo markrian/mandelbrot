@@ -12,6 +12,8 @@ function receiveJob(event: ToWorkerMessageEvent): void {
         ...rowJob,
         counts,
     };
+
+    postMessage(rowJob);
 }
 
 function mandelbrot(complex: Complex, max: number): number {

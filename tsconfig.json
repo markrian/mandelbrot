@@ -1,6 +1,10 @@
 {
   "files": [
-    "app.ts"
+    "index.ts",
+    "worker.ts"
+  ],
+  "lib": [
+    "webworker"
   ],
   "compilerOptions": {
     "target": "es5",

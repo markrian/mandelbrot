@@ -49,7 +49,7 @@ class MandelbrotRenderer {
         workerPoolSize: number,
     ) {
         this.ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-        this.workerPool = new WorkerPool(this.drawRow.bind(this), 'worker.js', workerPoolSize)
+        this.workerPool = new WorkerPool(this.drawRow.bind(this), 'worker/worker.js', workerPoolSize);
     }
 
     drawRow(rowJob: CompletedRowJob) {

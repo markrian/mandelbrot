@@ -1,5 +1,10 @@
 interface RowJob {
     row: number;
+    realMin: number;
+    realMax: number;
+    iterations: number;
+    imag: number;
+    width: number;
 }
 
 interface PendingRowJob extends RowJob {
@@ -23,13 +28,11 @@ type Coords = {
     x: number;
     y: number;
 }
-const coords = (x: number, y: number): Coords => ({ x, y });
 
 type Complex = {
     real: number;
     imag: number;
 }
-const complex = (real: number, imag: number): Complex => ({ real, imag });
 
 function coordsToComplex(coords: Coords, centre: Complex, zoom: number, width: number, height: number): Complex {
     let { x: real, y: imag } = coords;
@@ -46,7 +49,7 @@ function coordsToComplex(coords: Coords, centre: Complex, zoom: number, width: n
     real = centre.real + real - xRange / 2;
     imag = centre.imag + (yRange / 2) - imag;
 
-    return complex(real, imag);
+    return { real, imag };
 }
 
 function sortByFurthestFrom(n: number) {

@@ -1,5 +1,17 @@
 function receiveJob(event: ToWorkerMessageEvent): void {
     const rowJob = event.data;
+    const counts: number[] = [];
+
+    for (let x = 0; x < rowJob.width; x++) {
+        const real = rowJob.realMin + (x / rowJob.width)*(rowJob.realMax - rowJob.realMin);
+        counts.push(mandelbrot({ real, imag: rowJob.imag }, rowJob.iterations));
+    }
+
+    // iterate over complex numbers for given row
+    const completedRowJob: CompletedRowJob = {
+        ...rowJob,
+        counts,
+    };
 }
 
 function mandelbrot(complex: Complex, max: number): number {

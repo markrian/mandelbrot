@@ -100,7 +100,7 @@ class MandelbrotRenderer {
     onResize() {
         this.width = this.canvas.width = window.innerWidth;
         this.height = this.canvas.height = window.innerHeight;
-        this.imageData = this.ctx.createImageData(this.width, this.height);
+        this.imageData = this.ctx.createImageData(this.width, 1);
         this.redraw();
     }
 

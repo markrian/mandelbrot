@@ -50,6 +50,7 @@ class MandelbrotRenderer {
     ) {
         this.ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         this.workerPool = new WorkerPool(e => this.drawRow(e), 'worker/worker.js', workerPoolSize);
+        canvas.addEventListener('click', () => this.zoomOut());
         window.addEventListener('resize', () => this.onResize());
         this.onResize();
     }
@@ -57,14 +58,18 @@ class MandelbrotRenderer {
     drawRow(event: FromWorkerMessageEvent) {
         if (this.imageData === undefined) throw new Error('this.imageData is undefined');
         this.log('received worker message', event.target);
-        const { counts, row } = event.data;
-        this.writeImageData(counts);
-        this.ctx.putImageData(this.imageData, 0, row)
+        this.writeImageData(event.data);
+        this.ctx.putImageData(this.imageData, 0, event.data.row);
+    }
+
+    zoomOut() {
+        this.zoom /= 2;
+        this.redraw();
     }
 
     redraw() {
         this.workerPool.run({
-            row: 1,
+            row: 150,
             realMin: -1,
             realMax: 1,
             iterations: 10,
@@ -81,24 +86,22 @@ class MandelbrotRenderer {
         this.redraw();
     }
 
-    writeImageData(counts: number[]) {
+    writeImageData(rowJob: CompletedRowJob) {
         if (this.imageData === undefined) throw new Error('this.imageData is undefined');
         const { imageData } = this;
         let x, y, count, rgb;
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            y = Math.round(i / (imageData.width * 4));
-            x = (i / 4) % imageData.width;
-            const complex = coordsToComplex({ x, y }, this.centre, this.zoom, this.width, this.height);
-            count = counts[i];
+        for (let i = 0; i < imageData.width; i++) {
+            const complex = coordsToComplex({ x: i, y: rowJob.row }, this.centre, this.zoom, this.width, this.height);
+            count = rowJob.counts[i];
             if (count === this.iterations) {
                 rgb = [0, 0, 0];
             } else {
                 rgb = countToRGB(count, this.iterations);
             }
-            imageData.data[i] = rgb[0];
-            imageData.data[i + 1] = rgb[1];
-            imageData.data[i + 2] = rgb[2];
-            imageData.data[i + 3] = 255;
+            imageData.data[4 * i + 0] = rgb[0];
+            imageData.data[4 * i + 1] = rgb[1];
+            imageData.data[4 * i + 2] = rgb[2];
+            imageData.data[4 * i + 3] = 255;
         }
     }
 
@@ -199,7 +202,7 @@ function countToRGB(count: number, max: number) {
 function run() {
     const canvas = <HTMLCanvasElement>document.getElementById('fractal');
     const mandelbrot = new MandelbrotRenderer(canvas, 1);
-    window['m'] = mandelbrot;
+    window.m = mandelbrot;
 
 }
 

@@ -10,9 +10,13 @@ interface CompletedRowJob extends PendingRowJob {
     counts: number[];
 }
 
-interface WorkerMessageEvent extends MessageEvent {
+interface FromWorkerMessageEvent extends MessageEvent {
     target: Worker;
     data: CompletedRowJob;
+}
+
+interface ToWorkerMessageEvent extends MessageEvent {
+    data: PendingRowJob;
 }
 
 type Coords = {
@@ -114,7 +118,7 @@ class WorkerPool {
     private workers: Worker[] = [];
 
     constructor(
-        private onMessage: (e: WorkerMessageEvent) => void,
+        private onMessage: (e: FromWorkerMessageEvent) => void,
         url: string,
         size: number,
     ) {
@@ -139,7 +143,7 @@ class WorkerPool {
         this.jobsId++;
     }
 
-    private doOnMessage(event: WorkerMessageEvent) {
+    private doOnMessage(event: FromWorkerMessageEvent) {
         if (event.data.id !== this.jobsId) return;
         // check if worker is idle:
         // if so, send it another job, if any left

@@ -1,3 +1,9 @@
+import {
+    ToWorkerMessageEvent,
+    Complex,
+    CompletedRowJob,
+} from './index';
+
 function receiveJob(event: ToWorkerMessageEvent): void {
     const rowJob = event.data;
     const counts: number[] = [];

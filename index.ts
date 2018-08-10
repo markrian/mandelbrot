@@ -11,7 +11,7 @@ interface PendingRowJob extends RowJob {
     id: number;
 }
 
-interface CompletedRowJob extends PendingRowJob {
+export interface CompletedRowJob extends PendingRowJob {
     counts: number[];
 }
 
@@ -20,7 +20,7 @@ interface FromWorkerMessageEvent extends MessageEvent {
     data: CompletedRowJob;
 }
 
-interface ToWorkerMessageEvent extends MessageEvent {
+export interface ToWorkerMessageEvent extends MessageEvent {
     data: PendingRowJob;
 }
 
@@ -29,7 +29,7 @@ type Coords = {
     y: number;
 }
 
-type Complex = {
+export type Complex = {
     real: number;
     imag: number;
 }
@@ -63,7 +63,7 @@ function sortByFurthestFrom(n: number) {
 class MandelbrotRenderer {
     private ctx: CanvasRenderingContext2D;
     private workerPool: WorkerPool;
-    private imageData: ImageData;
+    private imageData: ImageData | undefined;
     private width = 100;
     private height = 100;
     public iterations = 75;
@@ -74,11 +74,12 @@ class MandelbrotRenderer {
         private canvas: HTMLCanvasElement,
         workerPoolSize: number,
     ) {
-        this.ctx = canvas.getContext('2d');
+        this.ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         this.workerPool = new WorkerPool(this.drawRow.bind(this), 'worker.js', workerPoolSize)
     }
 
     drawRow(rowJob: CompletedRowJob) {
+        if (this.imageData === undefined) throw new Error('this.imageData is undefined');
         this.writeImageData(rowJob.counts);
         this.ctx.putImageData(this.imageData, 0, rowJob.row)
     }
@@ -98,6 +99,7 @@ class MandelbrotRenderer {
     }
     
     writeImageData(counts: number[]) {
+        if (this.imageData === undefined) throw new Error('this.imageData is undefined');
         const { imageData } = this;
         let x, y, count, rgb;
         for (let i = 0; i < imageData.data.length; i += 4) {

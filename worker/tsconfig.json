@@ -1,11 +1,15 @@
 {
   "files": [
-    "index.ts"
+    "worker.ts"
   ],
   "compilerOptions": {
+    "lib": [
+      "es2015",
+      "webworker"
+    ],
     "target": "es2015",
     "module": "es2015",
-    "outDir": "dist",
+    "outDir": "../dist",
     "strict": true
   }
 }

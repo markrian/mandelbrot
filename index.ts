@@ -8,6 +8,11 @@ import {
     ToWorkerMessageEvent,
 } from './interfaces';
 
+const enum MouseButton {
+    LEFT = 0,
+    RIGHT = 2,
+}
+
 function middleOnesLast(length: number) {
     const middle = Math.floor(length / 2);
     return function (a: number, b: number) {
@@ -59,9 +64,39 @@ class MandelbrotRenderer {
     ) {
         this.ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         this.workerPool = new WorkerPool(e => this.drawRow(e), 'worker/worker.js', workerPoolSize);
-        canvas.addEventListener('click', () => this.zoomOut());
+        canvas.addEventListener('wheel', e => this.onWheel(e));
+        canvas.addEventListener('click', e => this.onClick(e));
+        canvas.addEventListener('contextmenu', e => this.onClick(e));
         window.addEventListener('resize', () => this.onResize());
         this.onResize();
+    }
+
+    private onWheel(event: MouseWheelEvent) {
+        if (event.deltaY < 0) {
+            this.zoomIn({ x: event.pageX, y: event.pageY });
+        } else {
+            this.zoomOut();
+        }
+    }
+
+    private onClick(event: MouseEvent) {
+        if (event.button === MouseButton.LEFT) {
+            this.zoomIn({ x: event.pageX, y: event.pageY });
+        } else if (event.button === MouseButton.RIGHT) {
+            this.zoomOut();
+        }
+        event.preventDefault();
+    }
+
+    private zoomIn(coords: Coords) {
+        this.zoom *= 2;
+        this.centre = this.coordsToComplex(coords);
+        this.redraw();
+    }
+
+    private zoomOut() {
+        this.zoom /= 2;
+        this.redraw();
     }
 
     drawRow(event: FromWorkerMessageEvent) {
@@ -69,11 +104,6 @@ class MandelbrotRenderer {
         this.log('received worker message', event.target);
         this.writeImageData(event.data);
         this.ctx.putImageData(this.imageData, 0, event.data.row);
-    }
-
-    zoomOut() {
-        this.zoom /= 2;
-        this.redraw();
     }
 
     redraw() {

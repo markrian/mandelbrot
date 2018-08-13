@@ -78,14 +78,18 @@ class MandelbrotRenderer {
 
     redraw() {
         this.log('redrawing');
-        this.workerPool.run(...this.rowsIndices().map(row => ({
-            row,
-            realMin: -1,
-            realMax: 1,
-            iterations: 10,
-            imag: .5,
-            width: this.width,
-        })));
+        this.workerPool.run(...this.rowsIndices().map(row => {
+            const rowBeginningComplex = this.coordsToComplex({ x: 0, y: row });
+            const rowEndComplex = this.coordsToComplex({ x: this.width, y: row });
+            return {
+                row,
+                realMin: rowBeginningComplex.real,
+                realMax: rowEndComplex.real,
+                iterations: 10,
+                imag: rowBeginningComplex.imag,
+                width: this.width,
+            };
+        }));
     }
 
     private rowsIndices() {
@@ -109,7 +113,7 @@ class MandelbrotRenderer {
         const { imageData } = this;
         let x, y, count, rgb;
         for (let i = 0; i < imageData.width; i++) {
-            const complex = coordsToComplex({ x: i, y: rowJob.row }, this.centre, this.zoom, this.width, this.height);
+            const complex = this.coordsToComplex({ x: i, y: rowJob.row });
             count = rowJob.counts[i];
             if (count === this.iterations) {
                 rgb = [0, 0, 0];
@@ -121,6 +125,10 @@ class MandelbrotRenderer {
             imageData.data[4 * i + 2] = rgb[2];
             imageData.data[4 * i + 3] = 255;
         }
+    }
+
+    private coordsToComplex(coords: Coords) {
+        return coordsToComplex(coords, this.centre, this.zoom, this.width, this.height);
     }
 
     private log(message: string, ...rest: any[]) {

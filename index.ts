@@ -57,6 +57,7 @@ class MandelbrotRenderer {
     public iterations = 75;
     public zoom = 1;
     public centre: Complex = { real: -.75, imag: 0 };
+    public onRedraw: (self: this) => void = () => {};
 
     constructor(
         private canvas: HTMLCanvasElement,
@@ -108,6 +109,7 @@ class MandelbrotRenderer {
 
     redraw() {
         this.log('redrawing');
+        this.onRedraw(this);
         this.workerPool.run(...this.rowsIndices().map(row => {
             const rowBeginningComplex = this.coordsToComplex({ x: 0, y: row });
             const rowEndComplex = this.coordsToComplex({ x: this.width, y: row });
@@ -115,7 +117,7 @@ class MandelbrotRenderer {
                 row,
                 realMin: rowBeginningComplex.real,
                 realMax: rowEndComplex.real,
-                iterations: 75,
+                iterations: this.iterations,
                 imag: rowBeginningComplex.imag,
                 width: this.width,
             };
@@ -265,6 +267,7 @@ class HashWatcher {
     constructor(private mandelbrot: MandelbrotRenderer) {
         this.readLocationHashAndRedraw();
         window.addEventListener('hashchange', () => this.readLocationHashAndRedraw());
+        mandelbrot.onRedraw = () => this.setLocationHash();
     }
 
     setLocationHash() {

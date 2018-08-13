@@ -13,11 +13,10 @@ const enum MouseButton {
     RIGHT = 2,
 }
 
-function middleOnesLast(length: number) {
-    const middle = Math.floor(length / 2);
+function closestToNLast(n: number) {
     return function (a: number, b: number) {
-        a = Math.abs(a - middle);
-        b = Math.abs(b - middle);
+        a = Math.abs(a - n);
+        b = Math.abs(b - n);
         return a < b ? 1 : -1;
     }
 }
@@ -92,7 +91,7 @@ class MandelbrotRenderer {
     private zoomIn(coords: Coords) {
         this.zoom *= 2;
         this.centre = this.coordsToComplex(coords);
-        this.redraw();
+        this.redraw(coords.y);
     }
 
     private zoomOut() {
@@ -102,15 +101,13 @@ class MandelbrotRenderer {
 
     drawRow(event: FromWorkerMessageEvent) {
         if (this.imageData === undefined) throw new Error('this.imageData is undefined');
-        this.log('received worker message', event.target);
         this.writeImageData(event.data);
         this.ctx.putImageData(this.imageData, 0, event.data.row);
     }
 
-    redraw() {
-        this.log('redrawing');
+    redraw(centreRow = this.height / 2) {
         this.onRedraw(this);
-        this.workerPool.run(...this.rowsIndices().map(row => {
+        this.workerPool.run(...this.rowsIndices(centreRow).map(row => {
             const rowBeginningComplex = this.coordsToComplex({ x: 0, y: row });
             const rowEndComplex = this.coordsToComplex({ x: this.width, y: row });
             return {
@@ -124,12 +121,13 @@ class MandelbrotRenderer {
         }));
     }
 
-    private rowsIndices() {
+    private rowsIndices(centreRow: number) {
         const rows: number[] = [];
         for (let i = 0; i < this.height; i++) {
             rows.push(i);
         }
-        rows.sort(middleOnesLast(this.height));
+        rows.sort(closestToNLast(centreRow));
+        this.log('redrawing with rows', rows.slice(0, 10), centreRow);
         return rows;
     }
 
@@ -200,7 +198,6 @@ class WorkerPool {
     }
 
     private doOnMessage(event: FromWorkerMessageEvent) {
-        this.log('received any message from a worker')
         if (event.data.id !== this.jobsId) return;
         // check if worker is idle:
         // if so, send it another job, if any left
@@ -264,6 +261,8 @@ function init() {
 }
 
 class HashWatcher {
+    private lastHash = '';
+
     constructor(private mandelbrot: MandelbrotRenderer) {
         this.readLocationHashAndRedraw();
         window.addEventListener('hashchange', () => this.readLocationHashAndRedraw());
@@ -272,12 +271,12 @@ class HashWatcher {
 
     setLocationHash() {
         const { centre, zoom, iterations } = this.mandelbrot;
-        location.hash = String([centre.real, centre.imag, zoom, iterations]);
+        location.hash = this.lastHash = String([centre.real, centre.imag, zoom, iterations]);
     }
     
     readLocationHashAndRedraw() {
         const hash = location.hash.slice(1);
-        if (hash === '') {
+        if (hash === '' || hash === this.lastHash) {
             return;
         }
 

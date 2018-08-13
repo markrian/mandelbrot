@@ -51,7 +51,7 @@ class MandelbrotRenderer {
     private height = 100;
     public iterations = 75;
     public zoom = 1;
-    public centre: Complex = { real: 0, imag: 0 };
+    public centre: Complex = { real: -.75, imag: 0 };
 
     constructor(
         private canvas: HTMLCanvasElement,
@@ -85,7 +85,7 @@ class MandelbrotRenderer {
                 row,
                 realMin: rowBeginningComplex.real,
                 realMax: rowEndComplex.real,
-                iterations: 10,
+                iterations: 75,
                 imag: rowBeginningComplex.imag,
                 width: this.width,
             };
@@ -227,9 +227,8 @@ function countToRGB(count: number, max: number) {
 
 function run() {
     const canvas = <HTMLCanvasElement>document.getElementById('fractal');
-    const mandelbrot = new MandelbrotRenderer(canvas, 1);
+    const mandelbrot = new MandelbrotRenderer(canvas, 4);
     window.m = mandelbrot;
-
 }
 
 document.addEventListener('DOMContentLoaded', run);

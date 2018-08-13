@@ -255,10 +255,36 @@ function countToRGB(count: number, max: number) {
     return hslToRgb(h, 0.8, 0.4);
 }
 
-function run() {
+function init() {
     const canvas = <HTMLCanvasElement>document.getElementById('fractal');
     const mandelbrot = new MandelbrotRenderer(canvas, 4);
-    window.m = mandelbrot;
+    const hashWatcher = new HashWatcher(mandelbrot);
 }
 
-document.addEventListener('DOMContentLoaded', run);
+class HashWatcher {
+    constructor(private mandelbrot: MandelbrotRenderer) {
+        this.readLocationHashAndRedraw();
+        window.addEventListener('hashchange', () => this.readLocationHashAndRedraw());
+    }
+
+    setLocationHash() {
+        const { centre, zoom, iterations } = this.mandelbrot;
+        location.hash = String([centre.real, centre.imag, zoom, iterations]);
+    }
+    
+    readLocationHashAndRedraw() {
+        const hash = location.hash.slice(1);
+        if (hash === '') {
+            return;
+        }
+
+        const [real, imag, zoom, iterations] = hash.split(',');
+        this.mandelbrot.centre.real = parseFloat(real);
+        this.mandelbrot.centre.imag = parseFloat(imag);
+        this.mandelbrot.zoom = parseFloat(zoom);
+        this.mandelbrot.iterations = parseFloat(iterations);
+        this.mandelbrot.redraw();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);

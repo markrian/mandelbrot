@@ -96,7 +96,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         tile.width = tileSize.x;
         tile.height = tileSize.y;
         const ctx = tile.getContext('2d');
-        const iterations = 75;
+        const iterations = 800;
 
         const zoomFactor = Math.pow(2, -coords.z);
         const complexBounds = {

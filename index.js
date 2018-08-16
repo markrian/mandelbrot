@@ -93,8 +93,11 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     createTile(coords, done) {
         const tileSize = this.getTileSize();
         const tile = document.createElement('canvas');
+        tile.width = tileSize.x;
+        tile.height = tileSize.y;
         const ctx = tile.getContext('2d');
         const iterations = 75;
+
         const zoomFactor = Math.pow(2, -coords.z);
         const complexCoords = {
             real: coords.x * zoomFactor,

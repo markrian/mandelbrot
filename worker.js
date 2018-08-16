@@ -1,28 +1,26 @@
-import {
-    ToWorkerMessageEvent,
-    Complex,
-    CompletedRowJob,
-} from '../interfaces';
+function receiveJob(event) {
+    const { coords, tileSize, iterations } = event.data;
 
-function receiveJob(event: ToWorkerMessageEvent): void {
-    const rowJob = event.data;
-    const counts: number[] = [];
+    const imageData = new ImageData(tileSize.x, tileSize.y);
+    const rgba = [rand(0, 255), rand(0, 255), rand(0, 255), 255];
 
-    for (let x = 0; x < rowJob.width; x++) {
-        const real = rowJob.realMin + (x / rowJob.width) * (rowJob.realMax - rowJob.realMin);
-        counts.push(mandelbrot({ real, imag: rowJob.imag }, rowJob.iterations));
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        imageData.data[i] = rgba[0];
+        imageData.data[i + 1] = rgba[1];
+        imageData.data[i + 2] = rgba[2];
+        imageData.data[i + 3] = rgba[3];
     }
 
-    // iterate over complex numbers for given row
-    const completedRowJob: CompletedRowJob = {
-        ...rowJob,
-        counts,
-    };
+    event.data.imageData = imageData;
 
-    postMessage(completedRowJob);
+    postMessage(event.data);
 }
 
-function mandelbrot(complex: Complex, max: number): number {
+function rand(min, max) {
+    return min + Math.floor((max - min + 1) * Math.random());
+}
+
+function mandelbrot(complex, max) {
     let count = 0;
     let zr = 0;
     let zi = 0;

@@ -5,12 +5,13 @@ function Job(message) {
         _reject = reject;
     });
 
+    const id = Job.id++;
     return {
-        id: Job.id++,
+        id,
         promise,
         resolve: _resolve,
         reject: _reject,
-        message,
+        message: { id, ...message },
         posted: false,
     };
 }
@@ -85,14 +86,24 @@ const map = L.map('fractal', {
     zoom: 0,
 });
 
+const mandelbrotRenderer = new MandelbrotRenderer(4);
+
 L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     createTile(coords, done) {
         const tileSize = this.getTileSize();
         const tile = document.createElement('canvas');
         const ctx = tile.getContext('2d');
+        const iterations = 75;
 
         mandelbrotRenderer.getImageData(coords, tileSize, iterations)
-            .then(imageData => ctx.putImageData(imageData, 0, 0));
+            .then(imageData => {
+                ctx.putImageData(imageData, 0, 0);
+                done(null, tile);
+            })
+            .catch(error => {
+                console.error(error);
+                done(error);
+            });
 
         return tile;
     }

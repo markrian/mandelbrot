@@ -11,7 +11,7 @@ function Job(message) {
         promise,
         resolve: _resolve,
         reject: _reject,
-        message: { id, ...message },
+        message: Object.assign({}, { id }, message),
         posted: false,
     };
 }

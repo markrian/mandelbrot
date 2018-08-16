@@ -96,7 +96,6 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         tile.width = tileSize.x;
         tile.height = tileSize.y;
         const ctx = tile.getContext('2d');
-        const iterations = 800;
 
         const zoomFactor = Math.pow(2, -coords.z);
         const complexBounds = {
@@ -106,7 +105,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
-        mandelbrotRenderer.getImageData(complexBounds, tileSize, iterations)
+        mandelbrotRenderer.getImageData(complexBounds, tileSize, this._maxIterations)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
@@ -119,5 +118,15 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         return tile;
     }
 });
+
+L.GridLayer.MandelbrotLayer.addInitHook(function () {
+    this._maxIterations = 75;
+    this._maxIterationsSlider = document.getElementById('max-iterations');
+    this._maxIterationsSlider.value = String(this._maxIterations);
+    this._maxIterationsSlider.addEventListener('change', event => {
+        this._maxIterations = Number(event.target.value);
+        this.redraw();
+    });
+})
 
 map.addLayer(new L.GridLayer.MandelbrotLayer());

@@ -26,13 +26,8 @@ function receiveJob(event) {
     postMessage(event.data);
 }
 
-const palette = [];
-for (let i = 0; i < 1024; i++) {
-    palette.push([triangle(i * 2, 255), triangle(i * 3, 255), triangle(i * 5, 255)]);
-}
-
-function countToRGB(count, paletteSize = 1024) {
-    return palette[count % paletteSize];
+function countToRGB(count) {
+    return [triangle(count * 2, 255), triangle(count * 3, 255), triangle(count * 5, 255)];
 }
 
 function triangle(n, max) {

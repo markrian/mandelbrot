@@ -1,3 +1,0 @@
-- Image of fractal is quite aliased - what can (easily) be done about this?
-/ Try to make redraws start from click/wheel position first
-/ Prevent double-redraw from hash watcher and mouse event listeners

@@ -3,18 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "description": "A simple Mandelbrot set viewer",
-  "main": "app.js",
-  "scripts": {
-    "build": "rm -rf dist && tsc --build tsconfig.json worker/tsconfig.json && cp index.html dist"
-  },
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/markrian/mandelbrot.git"
   },
   "keywords": [],
   "author": "Mark Florian <markrian@gmail.com>",
-  "license": "ISC",
-  "devDependencies": {
-    "typescript": "^3.0.1"
-  }
+  "license": "ISC"
 }

@@ -1,28 +1,17 @@
 <!doctype html>
-<title>Fractal</title>
-<style>
-html, body {
-    padding: 0;
-    margin: 0;
-    height: 100%;
-    width: 100%;
-}
-canvas {
-    display: block;
-}
-#log {
-    position: fixed;
-    top: 0;
-    left: 0;
-}
-#iterations {
-    position: fixed;
-    top: 0;
-    right: 0;
-}
-</style>
-<script src="index.js"></script>
-<canvas id="fractal"></canvas>
-<div id=log></div>
-<input type="range" min="1" max="500" id="iterations">
+<html>
 
+<head>
+    <meta charset="utf8">
+    <title>Fractal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin>
+    <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js" integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q==" crossorigin></script>
+</head>
+
+<body>
+    <div id="fractal"></div>
+    <script src="index.js"></script>
+</body>
+
+</html>

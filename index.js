@@ -1,16 +1,24 @@
-function Deferred() {
-    const deferred = { promise: null, resolve: noop, reject: noop };
-    deferred.promise = new Promise((resolve, reject) => {
-        deferred.resolve = resolve;
-        deferred.reject = reject;
+function Job(message) {
+    let _resolve, _reject;
+    const promise = new Promise((resolve, reject) => {
+        _resolve = resolve;
+        _reject = reject;
     });
 
-    return deferred;
+    return {
+        id: Job.id++,
+        promise,
+        resolve: _resolve,
+        reject: _reject,
+        message,
+        posted: false,
+    };
 }
+Job.id = 0;
 
 class MandelbrotRenderer {
     constructor(numWorkers) {
-        this._deferreds = new Map();
+        this._jobs = new Map();
         this._workers = [];
         const boundOnMessage = this.onMessage.bind(this);
         while (numWorkers--) {
@@ -22,49 +30,49 @@ class MandelbrotRenderer {
     }
 
     getImageData(coords, tileSize, iterations) {
-        const deferred = Deferred();
-        this._deferreds.push(deferred);
+        const job = Job({ coords, tileSize, iterations });
+        this._jobs.set(job.id, job);
 
         // try to send message to idle worker, if any
         for (const worker of this._workers) {
             if (worker.idle) {
-                worker.idle = false;
-                worker.postMessage({
-                    id: ++this._id,
-                    coords,
-                    tileSize,
-                    iterations,
-                });
+                this.postJob(job, worker);
                 break;
             }
         }
 
-        return deferred.promise;
+        return job.promise;
+    }
+
+    postJob(job, worker) {
+        if (!worker.idle) {
+            throw new Error('tried to post message to non-idle worker');
+        }
+        worker.idle = false;
+        job.posted = true;
+        worker.postMessage(job.message);
     }
 
     onMessage(event) {
         const worker = event.target;
-        if (worker.idle === false) {
-            console.warn('just received message from non-idle worker - should never happen?');
-        }
+        worker.idle = true;
 
         // resolve deferred
-        const deferred = this._deferreds.get(event.data.id);
-        if (deferred !== undefined) {
-            deferred.resolve(event.data.imageData);
-            this._deferreds.delete(event.data.id);
+        const job = this._jobs.get(event.data.id);
+        if (job !== undefined) {
+            job.resolve(event.data.imageData);
+            this._jobs.delete(event.data.id);
         }
 
         // post new message if any deferreds still present
         const nextJob = this.getNextJob();
-        if (nextJob !== undefined && worker.idle) {
-            worker.idle = false;
-            worker.postMessage(nextJob.message);
+        if (nextJob !== undefined) {
+            this.postJob(nextJob, worker);
         }
     }
 
     getNextJob() {
-        for (const job of this._jobs.values()) {
+        for (const [id, job] of this._jobs) {
             if (!job.posted) {
                 return job;
             }

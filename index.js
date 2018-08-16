@@ -30,8 +30,8 @@ class MandelbrotRenderer {
         }
     }
 
-    getImageData(coords, tileSize, iterations) {
-        const job = Job({ coords, tileSize, iterations });
+    getImageData(coords, tileSize, iterations, zoom) {
+        const job = Job({ coords, tileSize, iterations, zoom });
         this._jobs.set(job.id, job);
 
         // try to send message to idle worker, if any
@@ -79,6 +79,20 @@ class MandelbrotRenderer {
             }
         }
     }
+
+    clearJobs(predicate) {
+        if (predicate === undefined) {
+            this._jobs.clear();
+            return;
+        }
+        const toRemove = [];
+        for (const [id, job] of this._jobs) {
+            if (!job.posted && predicate(job)) {
+                toRemove.push(id);
+            }
+        }
+        toRemove.forEach(id => this._jobs.delete(id));
+    }
 }
 
 const map = L.map('fractal', {
@@ -105,7 +119,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
-        mandelbrotRenderer.getImageData(complexBounds, tileSize, this._maxIterations)
+        mandelbrotRenderer.getImageData(complexBounds, tileSize, this._maxIterations, coords.z)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
@@ -125,8 +139,13 @@ L.GridLayer.MandelbrotLayer.addInitHook(function () {
     this._maxIterationsSlider.value = String(this._maxIterations);
     this._maxIterationsSlider.addEventListener('change', event => {
         this._maxIterations = Number(event.target.value);
+        mandelbrotRenderer.clearJobs();
         this.redraw();
     });
 })
 
 map.addLayer(new L.GridLayer.MandelbrotLayer());
+map.on('zoom', () => {
+    const zoom = map.getZoom();
+    mandelbrotRenderer.clearJobs(job => job.message.zoom !== zoom);
+});

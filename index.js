@@ -95,8 +95,14 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         const tile = document.createElement('canvas');
         const ctx = tile.getContext('2d');
         const iterations = 75;
+        const zoomFactor = Math.pow(2, -coords.z);
+        const complexCoords = {
+            real: coords.x * zoomFactor,
+            imag: coords.y * zoomFactor,
+            zoom: coords.z,
+        }
 
-        mandelbrotRenderer.getImageData(coords, tileSize, iterations)
+        mandelbrotRenderer.getImageData(complexCoords, tileSize, iterations)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);

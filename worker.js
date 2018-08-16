@@ -2,7 +2,7 @@ function receiveJob(event) {
     const { coords, tileSize, iterations } = event.data;
 
     const imageData = new ImageData(tileSize.x, tileSize.y);
-    const rgba = [mod(coords.x * 16), mod(coords.y * 16), mod((coords.x + coords.y) * 16), 255];
+    const rgba = [mod(coords.real * 16), mod(coords.imag * 16), mod((coords.real + coords.imag) * 16), 255];
 
     for (let i = 0; i < imageData.data.length; i += 4) {
         imageData.data[i] = rgba[0];

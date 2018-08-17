@@ -95,14 +95,6 @@ class MandelbrotRenderer {
     }
 }
 
-const map = L.map('fractal', {
-    center: [0, 0],
-    zoom: 0,
-    crs: L.CRS.Simple,
-});
-
-const mandelbrotRenderer = new MandelbrotRenderer(4);
-
 L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     createTile(coords, done) {
         const tileSize = this.getTileSize();
@@ -119,7 +111,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
-        mandelbrotRenderer.getImageData(complexBounds, tileSize, this._maxIterations, coords.z)
+        this.mandelbrotRenderer.getImageData(complexBounds, tileSize, this._maxIterations, coords.z)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
@@ -137,9 +129,10 @@ L.GridLayer.MandelbrotLayer.addInitHook(function () {
     this._maxIterations = 75;
     this._maxIterationsSlider = document.getElementById('max-iterations');
     this._maxIterationsSlider.value = String(this._maxIterations);
+    this.mandelbrotRenderer = new MandelbrotRenderer(4);
     this._maxIterationsSlider.addEventListener('change', event => {
         this._maxIterations = Number(event.target.value);
-        mandelbrotRenderer.clearJobs();
+        this.mandelbrotRenderer.clearJobs();
         this.redraw();
     });
 });
@@ -165,18 +158,20 @@ L.Control.Iterations = L.Control.extend({
             name + '-header',
             container,
         );
+
+        const buttonsContainer = L.DomUtil.create('div', name + '-controls', container)
         this._moreIterationsButton = this._createButton(
             this.options.moreIterationsText,
             this.options.moreIterationsTitle,
             name + '-more',
-            container,
+            buttonsContainer,
             this._moreIterations
         );
         this._fewerIterationsButton = this._createButton(
             this.options.fewerIterationsText,
             this.options.fewerIterationsTitle,
             name + '-fewer',
-            container,
+            buttonsContainer,
             this._fewerIterations
         );
 
@@ -186,16 +181,16 @@ L.Control.Iterations = L.Control.extend({
     },
 
     _createHeader: function (html, title, className, container, fn) {
-        var header = DomUtil.create('span', className, container);
+        var header = L.DomUtil.create('span', className, container);
         header.innerHTML = html;
         header.title = title;
         header.setAttribute('aria-label', title);
-        DomEvent.disableClickPropagation(header);
+        L.DomEvent.disableClickPropagation(header);
         return header;
     },
 
     _createButton: function (html, title, className, container, fn) {
-        var link = DomUtil.create('a', className, container);
+        var link = L.DomUtil.create('a', className, container);
         link.innerHTML = html;
         link.href = '#';
         link.title = title;
@@ -206,10 +201,10 @@ L.Control.Iterations = L.Control.extend({
         link.setAttribute('role', 'button');
         link.setAttribute('aria-label', title);
 
-        DomEvent.disableClickPropagation(link);
-        DomEvent.on(link, 'click', DomEvent.stop);
-        DomEvent.on(link, 'click', fn, this);
-        DomEvent.on(link, 'click', this._refocusOnMap, this);
+        L.DomEvent.disableClickPropagation(link);
+        L.DomEvent.on(link, 'click', L.DomEvent.stop);
+        L.DomEvent.on(link, 'click', fn, this);
+        L.DomEvent.on(link, 'click', this._refocusOnMap, this);
 
         return link;
     },
@@ -227,7 +222,18 @@ L.Control.Iterations = L.Control.extend({
     _updateIterationsHeader() {
         console.log('set number of iterations in header')
     }
-})
+});
+
+L.Map.addInitHook(function () {
+    this.iterationsControl = new L.Control.Iterations();
+    this.addControl(this.iterationsControl);
+});
+
+const map = L.map('fractal', {
+    center: [0, 0],
+    zoom: 0,
+    crs: L.CRS.Simple,
+});
 
 map.addLayer(new L.GridLayer.MandelbrotLayer());
 map.on('zoom', () => {

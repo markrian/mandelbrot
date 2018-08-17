@@ -16,3 +16,27 @@ body {
     width: 200px;
     z-index: 10000;
 }
+
+.mandelbrot-iterations-header {
+    background-color: #f4f4f4;
+    display: block;
+    border-radius: 2px 2px 0 0;
+}
+
+.mandelbrot-iterations-controls {
+    display: flex;
+}
+
+.leaflet-touch .leaflet-bar.mandelbrot-iterations a:first-child {
+    border-radius: 0px 0px 0px 2px;
+    border-bottom: none;
+    border-right: 1px solid #ccc;
+}
+.leaflet-touch .leaflet-bar.mandelbrot-iterations a:last-child {
+    border-radius: 0px 0px 2px 0px;
+}
+
+.mandelbrot-iterations-more,
+.mandelbrot-iterations-fewer {
+    font-size: 22px;
+}

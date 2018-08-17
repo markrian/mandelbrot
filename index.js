@@ -142,6 +142,91 @@ L.GridLayer.MandelbrotLayer.addInitHook(function () {
         mandelbrotRenderer.clearJobs();
         this.redraw();
     });
+});
+
+L.Control.Iterations = L.Control.extend({
+    options: {
+        position: 'bottomright',
+        iterationsTitle: 'Change the number of iterations for the Mandelbrot set',
+        fewerIterationsTitle: 'Reduce the number of iterations',
+        moreIterationsTitle: 'Increase the number of iterations',
+        iterationsText: '⟳',
+        moreIterationsText: '+',
+        fewerIterationsText: '−',
+    },
+
+    onAdd(map) {
+        const name = 'mandelbrot-iterations';
+        const container = L.DomUtil.create('div', name + ' leaflet-bar');
+        
+        this._iterationsHeader = this._createHeader(
+            this.options.iterationsText,
+            this.options.iterationsTitle,
+            name + '-header',
+            container,
+        );
+        this._moreIterationsButton = this._createButton(
+            this.options.moreIterationsText,
+            this.options.moreIterationsTitle,
+            name + '-more',
+            container,
+            this._moreIterations
+        );
+        this._fewerIterationsButton = this._createButton(
+            this.options.fewerIterationsText,
+            this.options.fewerIterationsTitle,
+            name + '-fewer',
+            container,
+            this._fewerIterations
+        );
+
+        this._updateIterationsHeader();
+
+        return container;
+    },
+
+    _createHeader: function (html, title, className, container, fn) {
+        var header = DomUtil.create('span', className, container);
+        header.innerHTML = html;
+        header.title = title;
+        header.setAttribute('aria-label', title);
+        DomEvent.disableClickPropagation(header);
+        return header;
+    },
+
+    _createButton: function (html, title, className, container, fn) {
+        var link = DomUtil.create('a', className, container);
+        link.innerHTML = html;
+        link.href = '#';
+        link.title = title;
+
+		/*
+		 * Will force screen readers like VoiceOver to read this as "Zoom in - button"
+		 */
+        link.setAttribute('role', 'button');
+        link.setAttribute('aria-label', title);
+
+        DomEvent.disableClickPropagation(link);
+        DomEvent.on(link, 'click', DomEvent.stop);
+        DomEvent.on(link, 'click', fn, this);
+        DomEvent.on(link, 'click', this._refocusOnMap, this);
+
+        return link;
+    },
+
+    _moreIterations() {
+        console.log('supposed to increase the number of iterations');
+        this._updateIterationsHeader();
+    },
+
+    _fewerIterations() {
+        console.log('supposed to decrease the number of iterations');
+        this._updateIterationsHeader();
+    },
+
+    _updateIterationsHeader() {
+        console.log('set number of iterations in header')
+    }
 })
 
 map.addLayer(new L.GridLayer.MandelbrotLayer());

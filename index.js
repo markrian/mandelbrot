@@ -111,7 +111,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
-        this.mandelbrotRenderer.getImageData(complexBounds, tileSize, this._maxIterations, coords.z)
+        this.mandelbrotRenderer.getImageData(complexBounds, tileSize, this._iterations, coords.z)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
@@ -126,15 +126,20 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 });
 
 L.GridLayer.MandelbrotLayer.addInitHook(function () {
-    this._maxIterations = 75;
-    this._maxIterationsSlider = document.getElementById('max-iterations');
-    this._maxIterationsSlider.value = String(this._maxIterations);
-    this.mandelbrotRenderer = new MandelbrotRenderer(4);
+    const map = this._map;
+    this._iterations = 75;
+    this._mandelbrotRenderer = new MandelbrotRenderer(4);
     this._maxIterationsSlider.addEventListener('change', event => {
-        this._maxIterations = Number(event.target.value);
+        this._iterations = Number(event.target.value);
         this.mandelbrotRenderer.clearJobs();
         this.redraw();
     });
+    map.on('zoom', () => {
+        const zoom = map.getZoom();
+        this._mandelbrotRenderer.clearJobs(job => job.message.zoom !== zoom);
+    });
+    this._iterationsControl = new L.Control.Iterations();
+    map.addControl(this.iterationsControl);
 });
 
 L.Control.Iterations = L.Control.extend({
@@ -195,9 +200,6 @@ L.Control.Iterations = L.Control.extend({
         link.href = '#';
         link.title = title;
 
-		/*
-		 * Will force screen readers like VoiceOver to read this as "Zoom in - button"
-		 */
         link.setAttribute('role', 'button');
         link.setAttribute('aria-label', title);
 
@@ -225,8 +227,6 @@ L.Control.Iterations = L.Control.extend({
 });
 
 L.Map.addInitHook(function () {
-    this.iterationsControl = new L.Control.Iterations();
-    this.addControl(this.iterationsControl);
 });
 
 const map = L.map('fractal', {
@@ -236,7 +236,3 @@ const map = L.map('fractal', {
 });
 
 map.addLayer(new L.GridLayer.MandelbrotLayer());
-map.on('zoom', () => {
-    const zoom = map.getZoom();
-    mandelbrotRenderer.clearJobs(job => job.message.zoom !== zoom);
-});

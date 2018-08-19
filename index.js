@@ -96,6 +96,17 @@ class MandelbrotRenderer {
 }
 
 L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
+    onAdd(map) {
+        map._iterations = 75;
+        map._mandelbrotRenderer = new MandelbrotRenderer(4);
+        map.on('zoom', () => {
+            const zoom = map.getZoom();
+            map._mandelbrotRenderer.clearJobs(job => job.message.zoom !== zoom);
+        });
+        map._iterationsControl = new L.Control.Iterations();
+        map.addControl(map._iterationsControl);
+    },
+
     createTile(coords, done) {
         const tileSize = this.getTileSize();
         const tile = document.createElement('canvas');
@@ -111,7 +122,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
-        this.mandelbrotRenderer.getImageData(complexBounds, tileSize, this._iterations, coords.z)
+        this._map._mandelbrotRenderer.getImageData(complexBounds, tileSize, this._iterations, coords.z)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
@@ -123,23 +134,6 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 
         return tile;
     }
-});
-
-L.GridLayer.MandelbrotLayer.addInitHook(function () {
-    const map = this._map;
-    this._iterations = 75;
-    this._mandelbrotRenderer = new MandelbrotRenderer(4);
-    this._maxIterationsSlider.addEventListener('change', event => {
-        this._iterations = Number(event.target.value);
-        this.mandelbrotRenderer.clearJobs();
-        this.redraw();
-    });
-    map.on('zoom', () => {
-        const zoom = map.getZoom();
-        this._mandelbrotRenderer.clearJobs(job => job.message.zoom !== zoom);
-    });
-    this._iterationsControl = new L.Control.Iterations();
-    map.addControl(this.iterationsControl);
 });
 
 L.Control.Iterations = L.Control.extend({
@@ -156,6 +150,7 @@ L.Control.Iterations = L.Control.extend({
     onAdd(map) {
         const name = 'mandelbrot-iterations';
         const container = L.DomUtil.create('div', name + ' leaflet-bar');
+        this._map = this._map || map;
         
         this._iterationsHeader = this._createHeader(
             this.options.iterationsText,
@@ -212,21 +207,24 @@ L.Control.Iterations = L.Control.extend({
     },
 
     _moreIterations() {
-        console.log('supposed to increase the number of iterations');
+        const renderer = this._map._mandelbrotRenderer;
+        renderer.clearJobs();
+        renderer._iterations = Math.round(renderer._iterations * 1.1);
+        renderer.redraw();
         this._updateIterationsHeader();
     },
 
     _fewerIterations() {
-        console.log('supposed to decrease the number of iterations');
+        const renderer = this._map._mandelbrotRenderer;
+        renderer.clearJobs();
+        renderer._iterations = Math.round(renderer._iterations / 1.1);
+        renderer.redraw();
         this._updateIterationsHeader();
     },
 
     _updateIterationsHeader() {
         console.log('set number of iterations in header')
     }
-});
-
-L.Map.addInitHook(function () {
 });
 
 const map = L.map('fractal', {

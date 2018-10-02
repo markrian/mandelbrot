@@ -77,7 +77,7 @@ L.Map.include({
     },
 
     setIterations(iterations) {
-        this._mandelbrotLayer.setIterations();
+        this._mandelbrotLayer.setIterations(iterations);
     },
 
     increaseIterations() {

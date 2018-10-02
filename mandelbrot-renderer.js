@@ -12,9 +12,17 @@ export default class MandelbrotRenderer {
             worker.idle = true;
             this._workers.push(worker);
         }
+        this._pendingTiles = 0;
+        setInterval(() => {
+            console.log({
+                pending: this._pendingTiles,
+                jobs: this._jobs.size,
+            });
+        }, 1000);
     }
 
     getImageData(coords, tileSize, iterations, zoom) {
+        this._pendingTiles++;
         const job = Job({ coords, tileSize, iterations, zoom });
         this._jobs.set(job.id, job);
 
@@ -39,6 +47,7 @@ export default class MandelbrotRenderer {
     }
 
     onMessage(event) {
+        this._pendingTiles--;
         const worker = event.target;
         worker.idle = true;
 
@@ -70,6 +79,7 @@ export default class MandelbrotRenderer {
     clearJobs(predicate) {
         if (predicate === undefined) {
             this._jobs.clear();
+            this._pendingTiles = 0;
             return;
         }
         const toRemove = [];
@@ -78,6 +88,7 @@ export default class MandelbrotRenderer {
                 toRemove.push(id);
             }
         }
+        this._pendingTiles -= toRemove.length;
         toRemove.forEach(id => this._jobs.delete(id));
     }
 }

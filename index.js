@@ -104,6 +104,11 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         workers: 4,
     },
 
+    initialize(options) {
+        L.Util.setOptions(this, options);
+        this._renderer = new MandelbrotRenderer(this.options.workers);
+    },
+
     _multIterations(factor) {
         this._renderer.clearJobs();
         this.options.iterations = Math.round(this.options.iterations * factor);
@@ -119,8 +124,8 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     },
 
     onAdd(map) {
+        L.GridLayer.prototype.onAdd.apply(this, arguments);
         map._mandelbrotLayer = this;
-        this._renderer = new MandelbrotRenderer(this.options.workers);
         map.on('zoom', () => {
             const zoom = map.getZoom();
             this._renderer.clearJobs(job => job.message.zoom !== zoom);

@@ -1,4 +1,4 @@
-export default const L = getLeaflet();
+export default getLeaflet();
 
 function getLeaflet() {
     if ('L' in window) {

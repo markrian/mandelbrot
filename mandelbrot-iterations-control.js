@@ -1,6 +1,6 @@
 import L from './leaflet-shim.js';
 
-export default const IterationsControl = L.Control.extend({
+export default L.Control.extend({
     options: {
         position: 'bottomright',
         iterationsTitle: 'The current number of iterations',

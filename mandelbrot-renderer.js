@@ -1,7 +1,7 @@
 import L from './leaflet-shim.js';
 import Job from './job.js';
 
-class MandelbrotRenderer {
+export default class MandelbrotRenderer {
     constructor(numWorkers) {
         this._jobs = new Map();
         this._workers = [];

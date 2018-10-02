@@ -1,7 +1,7 @@
 import L from './leaflet-shim.js';
 import MandelbrotRenderer from './mandelbrot-renderer.js';
 
-export default const MandelbrotLayer = L.GridLayer.extend({
+export default L.GridLayer.extend({
     options: {
         iterations: 64,
         workers: 4,

@@ -1,6 +1,7 @@
 import L from './leaflet-shim.js';
 import MandelbrotLayer from './mandelbrot-layer.js';
 import './mandelbrot-iterations-control.js';
+import './mandelbrot-hash-handler.js';
 
 const map = L.map('fractal', {
     center: [0, 0],
@@ -10,3 +11,4 @@ const map = L.map('fractal', {
 });
 
 map.addLayer(new MandelbrotLayer());
+map.mandelbrotHash.enable();

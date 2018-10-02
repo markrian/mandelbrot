@@ -20,9 +20,54 @@ function Job(message) {
 }
 Job.id = 0;
 
+class Jobs {
+    constructor(max) {
+        this.max = max;
+        this._list = [];
+    }
+
+    get size() {
+        return this._list.length;
+    }
+
+    clear() {
+        while (this._list.length > 0) {
+            this._list.pop();
+        }
+    }
+
+    add(job) {
+        const numJobs = this._list.push(job);
+        if (numJobs > this.max) {
+            this._list.shift();
+        }
+    }
+
+    remove(predicate) {
+        for (let i = 0; i < this._list.length; i++) {
+            if (predicate(this._list[i])) {
+                this._list.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+    find(predicate) {
+        for (const job of this._list) {
+            if (predicate(job)) {
+                return job;
+            }
+        }
+    }
+
+    *[Symbol.iterator]() {
+        yield* this._list;
+    }
+}
+
 class MandelbrotRenderer {
     constructor(numWorkers) {
-        this._jobs = new Map();
+        this._jobs = new Jobs(numWorkers);
         this._workers = [];
         const boundOnMessage = this.onMessage.bind(this);
         while (numWorkers--) {
@@ -35,7 +80,7 @@ class MandelbrotRenderer {
 
     getImageData(coords, tileSize, iterations, zoom) {
         const job = Job({ coords, tileSize, iterations, zoom });
-        this._jobs.set(job.id, job);
+        this._jobs.add(job);
 
         // try to send message to idle worker, if any
         for (const worker of this._workers) {
@@ -62,10 +107,10 @@ class MandelbrotRenderer {
         worker.idle = true;
 
         // resolve deferred
-        const job = this._jobs.get(event.data.id);
+        const job = this._jobs.find(job => job.id === event.data.id);
         if (job !== undefined) {
             job.resolve(event.data.imageData);
-            this._jobs.delete(event.data.id);
+            this._jobs.remove(job => job.id === event.data.id);
         }
 
         // post new message if any deferreds still present
@@ -76,7 +121,7 @@ class MandelbrotRenderer {
     }
 
     getNextJob() {
-        for (const [id, job] of this._jobs) {
+        for (const job of this._jobs) {
             if (!job.posted) {
                 return job;
             }

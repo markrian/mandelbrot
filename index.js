@@ -100,7 +100,7 @@ class MandelbrotRenderer {
 
 L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     options: {
-        iterations: 75,
+        iterations: 64,
         workers: 4,
     },
 
@@ -113,14 +113,15 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         this._renderer.clearJobs();
         this.options.iterations = Math.round(this.options.iterations * factor);
         this.redraw();
+        this._map.fire('iterationschange', { value: this.options.iterations });
     },
 
     increaseIterations() {
-        this._multIterations(1.1);
+        this._multIterations(2);
     },
 
     decreaseIterations() {
-        this._multIterations(1/1.1);
+        this._multIterations(.5);
     },
 
     onAdd(map) {
@@ -162,6 +163,10 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 });
 
 L.Map.include({
+    getIterations() {
+        return this._mandelbrotLayer.options.iterations;
+    },
+
     increaseIterations() {
         this._mandelbrotLayer.increaseIterations();
     },
@@ -181,7 +186,6 @@ L.Control.Iterations = L.Control.extend({
         iterationsTitle: 'Change the number of iterations for the Mandelbrot set',
         decreaseIterationsTitle: 'Decrease the number of iterations',
         increaseIterationsTitle: 'Increase the number of iterations',
-        iterationsText: '⟳',
         increaseIterationsText: '+',
         decreaseIterationsText: '−',
     },
@@ -191,7 +195,7 @@ L.Control.Iterations = L.Control.extend({
         const container = L.DomUtil.create('div', name + ' leaflet-bar');
         
         this._iterationsHeader = this._createHeader(
-            this.options.iterationsText,
+            '',
             this.options.iterationsTitle,
             name + '-header',
             container,
@@ -213,7 +217,7 @@ L.Control.Iterations = L.Control.extend({
             this._decreaseIterations
         );
 
-        this._updateIterationsHeader();
+        this._map.on('iterationschange', this._updateIterationsHeader, this);
 
         return container;
     },
@@ -246,21 +250,19 @@ L.Control.Iterations = L.Control.extend({
 
     _increaseIterations() {
         this._map.increaseIterations();
-        this._updateIterationsHeader();
     },
 
     _decreaseIterations() {
         this._map.decreaseIterations();
-        this._updateIterationsHeader();
     },
 
-    _updateIterationsHeader() {
-        console.log('set number of iterations in header')
+    _updateIterationsHeader(e) {
+        this._iterationsHeader.textContent = String(e.value);
     }
 });
 
 L.Map.mergeOptions({
-    iterationsControl: true,
+    iterationsControl: false,
 });
 
 L.Map.addInitHook(function () {
@@ -278,6 +280,7 @@ const map = L.map('fractal', {
     center: [0, 0],
     zoom: 0,
     crs: L.CRS.Simple,
+    iterationsControl: true,
 });
 
 map.addLayer(new L.GridLayer.MandelbrotLayer());

@@ -9,28 +9,35 @@ body {
     height: 100%;
 }
 
-#max-iterations {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 200px;
-    z-index: 10000;
-}
-
 .mandelbrot-iterations-header {
     background-color: #f4f4f4;
     display: block;
     border-radius: 2px 2px 0 0;
 }
 
-.mandelbrot-iterations-controls {
-    display: flex;
+.mandelbrot-iterations-header::after {
+    content: "iterations";
 }
 
-.leaflet-touch .leaflet-bar.mandelbrot-iterations a:first-child {
-    border-radius: 0px 0px 0px 2px;
+.mandelbrot-iterations-controls {
+    display: flex;
+    font: bold 18px 'Lucida Console', Monaco, monospace;
+}
+
+.leaflet-touch .mandelbrot-iterations-controls {
+    font-size: 22px;
+}
+
+.leaflet-bar.mandelbrot-iterations a:first-child {
+    border-radius: 0px 0px 0px 4px;
     border-bottom: none;
     border-right: 1px solid #ccc;
+}
+.leaflet-touch .leaflet-bar.mandelbrot-iterations a:first-child {
+    border-radius: 0px 0px 0px 2px;
+}
+.leaflet-bar.mandelbrot-iterations a:last-child {
+    border-radius: 0px 0px 4px 0px;
 }
 .leaflet-touch .leaflet-bar.mandelbrot-iterations a:last-child {
     border-radius: 0px 0px 2px 0px;

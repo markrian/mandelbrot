@@ -57,6 +57,7 @@ export default L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
+        this._renderer.setCurrentViewBounds(this._map.getBounds());
         this._renderer.getImageData(complexBounds, tileSize, this.options.iterations, coords.z)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);

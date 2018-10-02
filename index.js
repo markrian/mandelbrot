@@ -1,3 +1,6 @@
+/**
+ * Mandelbrot Layer/Renderer
+ */
 function Job(message) {
     let _resolve, _reject;
     const promise = new Promise((resolve, reject) => {
@@ -96,8 +99,26 @@ class MandelbrotRenderer {
 }
 
 L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
+    options: {
+        iterations: 75,
+        workers: 4,
+    },
+
+    increaseIterations() {
+        const renderer = this._renderer;
+        renderer.clearJobs();
+        this._iterations = Math.round(this._iterations * 1.1);
+        renderer.redraw();
+    },
+
+    decreaseIterations() {
+        const renderer = this._renderer;
+        renderer.clearJobs();
+        this._iterations = Math.round(this._iterations / 1.1);
+        renderer.redraw();
+    }
+
     onAdd(map) {
-        map._iterations = 75;
         map._mandelbrotRenderer = new MandelbrotRenderer(4);
         map.on('zoom', () => {
             const zoom = map.getZoom();
@@ -136,21 +157,37 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     }
 });
 
+L.Map.include({
+    setIterations(iterations) {
+    },
+
+    increaseIterations() {
+        this._map._mandelbrotLayer.increaseIterations();
+    },
+
+    decreaseIterations() {
+        this._map._mandelbrotLayer.decreaseIterations();
+    },
+});
+
+
+/**
+ * Iterations Control
+ */
 L.Control.Iterations = L.Control.extend({
     options: {
         position: 'bottomright',
         iterationsTitle: 'Change the number of iterations for the Mandelbrot set',
-        fewerIterationsTitle: 'Reduce the number of iterations',
+        fewerIterationsTitle: 'Decrease the number of iterations',
         moreIterationsTitle: 'Increase the number of iterations',
         iterationsText: '⟳',
         moreIterationsText: '+',
         fewerIterationsText: '−',
     },
 
-    onAdd(map) {
+    onAdd() {
         const name = 'mandelbrot-iterations';
         const container = L.DomUtil.create('div', name + ' leaflet-bar');
-        this._map = this._map || map;
         
         this._iterationsHeader = this._createHeader(
             this.options.iterationsText,
@@ -207,18 +244,12 @@ L.Control.Iterations = L.Control.extend({
     },
 
     _moreIterations() {
-        const renderer = this._map._mandelbrotRenderer;
-        renderer.clearJobs();
-        renderer._iterations = Math.round(renderer._iterations * 1.1);
-        renderer.redraw();
+        this._map.increaseIterations();
         this._updateIterationsHeader();
     },
 
     _fewerIterations() {
-        const renderer = this._map._mandelbrotRenderer;
-        renderer.clearJobs();
-        renderer._iterations = Math.round(renderer._iterations / 1.1);
-        renderer.redraw();
+        this._map.decreaseIterations();
         this._updateIterationsHeader();
     },
 
@@ -227,6 +258,21 @@ L.Control.Iterations = L.Control.extend({
     }
 });
 
+L.Map.mergeOptions({
+    iterationsControl: true,
+});
+
+L.Map.addInitHook(function () {
+    if (this.options.iterationsControl) {
+        this.iterationsControl = new L.Control.Iterations();
+        this.addControl(this.iterationsControl);
+    }
+});
+
+
+/**
+ * Entry point
+ */
 const map = L.map('fractal', {
     center: [0, 0],
     zoom: 0,

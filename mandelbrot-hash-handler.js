@@ -4,6 +4,7 @@ const Hash = L.Handler.extend({
     addHooks() {
         L.DomEvent.on(window, 'hashchange', this._onHashChange, this);
         this._map.on('zoomend moveend iterationschange viewreset', this._updateHash, this);
+        this._map.whenReady(() => this._onHashChange({ newURL: window.location.href }));
     },
 
     removeHooks() {

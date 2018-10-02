@@ -1,2 +1,4 @@
  - Make locations/zooms/iterations linkable, like with previous version
     - Maybe a leaflet Handler for hashchange events?
+ - Add some optimizations (see wikipedia page)
+    - e.g., bulb-checking, periodicity checking

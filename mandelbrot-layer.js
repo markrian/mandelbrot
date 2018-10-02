@@ -14,19 +14,19 @@ export default L.GridLayer.extend({
         this._renderer = new MandelbrotRenderer(this.options.workers);
     },
 
-    _multIterations(factor) {
+    setIterations(iterations) {
         this._renderer.clearJobs();
-        this.options.iterations = Math.round(this.options.iterations * factor);
+        this.options.iterations = Math.round(this.options.iterations);
         this.redraw();
         this._map.fire('iterationschange', { value: this.options.iterations });
     },
 
     increaseIterations() {
-        this._multIterations(2);
+        this.setIterations(this.options.iterations * 2);
     },
 
     decreaseIterations() {
-        this._multIterations(.5);
+        this.setIterations(this.options.iterations * .5);
     },
 
     onAdd(map) {
@@ -71,6 +71,10 @@ export default L.GridLayer.extend({
 L.Map.include({
     getIterations() {
         return this._mandelbrotLayer.options.iterations;
+    },
+
+    setIterations(iterations) {
+        this._mandelbrotLayer.setIterations();
     },
 
     increaseIterations() {

@@ -2,3 +2,4 @@
     - Maybe a leaflet Handler for hashchange events?
  - Add some optimizations (see wikipedia page)
     - e.g., bulb-checking, periodicity checking
+ - Fix rendering with a non-default tileSize

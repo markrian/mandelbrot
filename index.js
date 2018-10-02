@@ -120,7 +120,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 
     onAdd(map) {
         map._mandelbrotLayer = this;
-        this._renderer = new MandelbrotRenderer(4);
+        this._renderer = new MandelbrotRenderer(this.options.workers);
         map.on('zoom', () => {
             const zoom = map.getZoom();
             this._renderer.clearJobs(job => job.message.zoom !== zoom);

@@ -25,6 +25,7 @@ const Hash = L.Handler.extend({
             this._map.getIterations(),
         ];
 
+        this._ignoreNextHashChange = true;
         window.location = this._partsToHash(parts);
     },
 
@@ -43,6 +44,11 @@ const Hash = L.Handler.extend({
     },
 
     _onHashChange(event) {
+        if (this._ignoreNextHashChange) {
+            this._ignoreNextHashChange = false;
+            return;
+        }
+
         const hash = event.newURL.slice(event.newURL.indexOf('#'));
         const parts = this._hashToParts(hash);
         if (parts === undefined) {

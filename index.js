@@ -120,6 +120,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     }
 
     onAdd(map) {
+        map._mandelbrotLayer = this;
         this._renderer = new MandelbrotRenderer(4);
         map.on('zoom', () => {
             const zoom = map.getZoom();
@@ -158,11 +159,11 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 
 L.Map.include({
     increaseIterations() {
-        this._map._mandelbrotLayer.increaseIterations();
+        this._mandelbrotLayer.increaseIterations();
     },
 
     decreaseIterations() {
-        this._map._mandelbrotLayer.decreaseIterations();
+        this._mandelbrotLayer.decreaseIterations();
     },
 });
 

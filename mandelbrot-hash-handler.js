@@ -12,7 +12,7 @@ const Hash = L.Handler.extend({
     },
 
     _updateHash() {
-        window.requestAnimationFrame(() => this._doUpdateHash);
+        window.requestAnimationFrame(() => this._doUpdateHash());
     },
 
     _doUpdateHash() {

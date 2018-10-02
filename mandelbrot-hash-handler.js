@@ -23,7 +23,6 @@ const Hash = L.Handler.extend({
             this._map.getZoom(),
             this._map.getIterations(),
         ];
-        console.log(center);
 
         window.location = this._partsToHash(parts);
     },

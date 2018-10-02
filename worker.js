@@ -13,7 +13,7 @@ function receiveJob(event) {
         if (count === iterations) {
             rgb = [0, 0, 0];
         } else {
-            rgb = countToRGB(count, iterations);
+            rgb = countToRGB(count);
         }
 
         imageData.data[i] = rgb[0];
@@ -27,7 +27,11 @@ function receiveJob(event) {
 }
 
 function countToRGB(count) {
-    return [triangle(count * 2, 255), triangle(count * 3, 255), triangle(count * 5, 255)];
+    return [
+        triangle(count * 2, 255),
+        triangle(count * 3, 255),
+        triangle(count * 5, 255),
+    ];
 }
 
 function triangle(n, max) {

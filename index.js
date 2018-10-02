@@ -105,11 +105,10 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     },
 
     _multIterations(factor) {
-        const renderer = this._renderer;
-        renderer.clearJobs();
+        this._renderer.clearJobs();
         this.options.iterations = Math.round(this.options.iterations * factor);
-        renderer.redraw();
-    }
+        this.redraw();
+    },
 
     increaseIterations() {
         this._multIterations(1.1);
@@ -117,7 +116,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 
     decreaseIterations() {
         this._multIterations(1/1.1);
-    }
+    },
 
     onAdd(map) {
         map._mandelbrotLayer = this;
@@ -154,7 +153,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             });
 
         return tile;
-    }
+    },
 });
 
 L.Map.include({
@@ -261,8 +260,8 @@ L.Map.mergeOptions({
 
 L.Map.addInitHook(function () {
     if (this.options.iterationsControl) {
-        this.iterationsControl = new L.Control.Iterations();
-        this.addControl(this.iterationsControl);
+        this._iterationsControl = new L.Control.Iterations();
+        this.addControl(this._iterationsControl);
     }
 });
 

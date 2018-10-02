@@ -15,8 +15,11 @@ export default L.GridLayer.extend({
     },
 
     setIterations(iterations) {
+        iterations = Math.round(iterations);
+        if (!Number.isFinite(iterations)) return;
+
         this._renderer.clearJobs();
-        this.options.iterations = Math.round(this.options.iterations);
+        this.options.iterations = iterations;
         this.redraw();
         this._map.fire('iterationschange', { value: this.options.iterations });
     },

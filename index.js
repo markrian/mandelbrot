@@ -102,6 +102,8 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
     options: {
         iterations: 64,
         workers: 4,
+        updateWhenIdle: true,
+        updateWhenZooming: false,
     },
 
     initialize(options) {

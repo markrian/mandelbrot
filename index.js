@@ -178,11 +178,11 @@ L.Control.Iterations = L.Control.extend({
     options: {
         position: 'bottomright',
         iterationsTitle: 'Change the number of iterations for the Mandelbrot set',
-        fewerIterationsTitle: 'Decrease the number of iterations',
-        moreIterationsTitle: 'Increase the number of iterations',
+        decreaseIterationsTitle: 'Decrease the number of iterations',
+        increaseIterationsTitle: 'Increase the number of iterations',
         iterationsText: '⟳',
-        moreIterationsText: '+',
-        fewerIterationsText: '−',
+        increaseIterationsText: '+',
+        decreaseIterationsText: '−',
     },
 
     onAdd() {
@@ -197,19 +197,19 @@ L.Control.Iterations = L.Control.extend({
         );
 
         const buttonsContainer = L.DomUtil.create('div', name + '-controls', container)
-        this._moreIterationsButton = this._createButton(
-            this.options.moreIterationsText,
-            this.options.moreIterationsTitle,
-            name + '-more',
+        this._increaseIterationsButton = this._createButton(
+            this.options.increaseIterationsText,
+            this.options.increaseIterationsTitle,
+            name + '-increase',
             buttonsContainer,
-            this._moreIterations
+            this._increaseIterations
         );
-        this._fewerIterationsButton = this._createButton(
-            this.options.fewerIterationsText,
-            this.options.fewerIterationsTitle,
-            name + '-fewer',
+        this._decreaseIterationsButton = this._createButton(
+            this.options.decreaseIterationsText,
+            this.options.decreaseIterationsTitle,
+            name + '-decrease',
             buttonsContainer,
-            this._fewerIterations
+            this._decreaseIterations
         );
 
         this._updateIterationsHeader();
@@ -243,12 +243,12 @@ L.Control.Iterations = L.Control.extend({
         return link;
     },
 
-    _moreIterations() {
+    _increaseIterations() {
         this._map.increaseIterations();
         this._updateIterationsHeader();
     },
 
-    _fewerIterations() {
+    _decreaseIterations() {
         this._map.decreaseIterations();
         this._updateIterationsHeader();
     },

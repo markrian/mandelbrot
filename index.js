@@ -131,6 +131,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             const zoom = map.getZoom();
             this._renderer.clearJobs(job => job.message.zoom !== zoom);
         });
+        map.fire('iterationschange', { value: this.options.iterations });
     },
 
     createTile(coords, done) {
@@ -183,9 +184,10 @@ L.Map.include({
 L.Control.Iterations = L.Control.extend({
     options: {
         position: 'bottomright',
-        iterationsTitle: 'Change the number of iterations for the Mandelbrot set',
+        iterationsTitle: 'The current number of iterations',
         decreaseIterationsTitle: 'Decrease the number of iterations',
         increaseIterationsTitle: 'Increase the number of iterations',
+        iterationsHeaderTitle: 'The current number of iterations',
         increaseIterationsText: '+',
         decreaseIterationsText: '−',
     },

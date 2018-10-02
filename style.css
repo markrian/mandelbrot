@@ -13,10 +13,9 @@ body {
     background-color: #f4f4f4;
     display: block;
     border-radius: 2px 2px 0 0;
-}
-
-.mandelbrot-iterations-header::after {
-    content: "iterations";
+    padding: 0 5px;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .mandelbrot-iterations-controls {

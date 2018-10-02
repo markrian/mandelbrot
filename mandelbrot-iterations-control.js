@@ -1,6 +1,6 @@
 import L from './leaflet-shim.js';
 
-export default L.Control.extend({
+const Iterations = L.Control.extend({
     options: {
         position: 'bottomright',
         iterationsTitle: 'The current number of iterations',
@@ -88,7 +88,7 @@ L.Map.mergeOptions({
 
 L.Map.addInitHook(function () {
     if (this.options.iterationsControl) {
-        this._iterationsControl = new L.Control.Iterations();
+        this._iterationsControl = new Iterations();
         this.addControl(this._iterationsControl);
     }
 });

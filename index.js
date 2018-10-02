@@ -1,5 +1,6 @@
 import L from './leaflet-shim.js';
 import MandelbrotLayer from './mandelbrot-layer.js';
+import './mandelbrot-iterations-control.js';
 
 const map = L.map('fractal', {
     center: [0, 0],

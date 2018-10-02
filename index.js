@@ -104,28 +104,27 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
         workers: 4,
     },
 
-    increaseIterations() {
+    _multIterations(factor) {
         const renderer = this._renderer;
         renderer.clearJobs();
-        this._iterations = Math.round(this._iterations * 1.1);
-        renderer.redraw();
-    },
-
-    decreaseIterations() {
-        const renderer = this._renderer;
-        renderer.clearJobs();
-        this._iterations = Math.round(this._iterations / 1.1);
+        this.options.iterations = Math.round(this.options.iterations * factor);
         renderer.redraw();
     }
 
+    increaseIterations() {
+        this._multIterations(1.1);
+    },
+
+    decreaseIterations() {
+        this._multIterations(1/1.1);
+    }
+
     onAdd(map) {
-        map._mandelbrotRenderer = new MandelbrotRenderer(4);
+        this._renderer = new MandelbrotRenderer(4);
         map.on('zoom', () => {
             const zoom = map.getZoom();
-            map._mandelbrotRenderer.clearJobs(job => job.message.zoom !== zoom);
+            this._renderer.clearJobs(job => job.message.zoom !== zoom);
         });
-        map._iterationsControl = new L.Control.Iterations();
-        map.addControl(map._iterationsControl);
     },
 
     createTile(coords, done) {
@@ -143,7 +142,7 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
-        this._map._mandelbrotRenderer.getImageData(complexBounds, tileSize, this._iterations, coords.z)
+        this._renderer.getImageData(complexBounds, tileSize, this.options.iterations, coords.z)
             .then(imageData => {
                 ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
@@ -158,9 +157,6 @@ L.GridLayer.MandelbrotLayer = L.GridLayer.extend({
 });
 
 L.Map.include({
-    setIterations(iterations) {
-    },
-
     increaseIterations() {
         this._map._mandelbrotLayer.increaseIterations();
     },

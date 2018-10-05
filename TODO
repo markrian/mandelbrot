@@ -1,8 +1,9 @@
- / Make locations/zooms/iterations linkable, like with previous version
+ - Make locations/zooms/iterations linkable, like with previous version
     / Maybe a leaflet Handler for hashchange events?
     / Make it read the hash on page load
     / Fix bug where it (sometimes? After reloading the page?) redraws
       unnecessarily after panning)
+    - Use actual complex coords in URL
  - Prune pending jobs if they're out of bounds of the view (perhaps in
    getNextJob)
  - Add some optimizations (see wikipedia page)

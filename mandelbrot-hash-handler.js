@@ -19,8 +19,8 @@ const Hash = L.Handler.extend({
     _doUpdateHash() {
         const center = this._map.getCenter();
         const parts = [
-            center.lat,
             center.lng,
+            center.lat,
             this._map.getZoom(),
             this._map.getIterations(),
         ];
@@ -61,7 +61,7 @@ const Hash = L.Handler.extend({
 
     _setupMap(real, imag, zoom, iterations) {
         this._map.setIterations(iterations);
-        this._map.setView([real, imag], zoom);
+        this._map.setView([imag, real], zoom);
     }
 });
 

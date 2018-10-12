@@ -9,3 +9,6 @@
  - Add some optimizations (see wikipedia page)
     - e.g., bulb-checking, periodicity checking
  - Fix rendering with a non-default tileSize
+    - A tileSize of 128 is probably optimal for performance and initial scale,
+      but then scale shouldn't depend on tileSize. MandelbrotLayer/Renderer
+      need to account for tileSize (or somehow be independent of it).

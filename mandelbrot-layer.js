@@ -36,8 +36,8 @@ export default L.GridLayer.extend({
         L.GridLayer.prototype.onAdd.apply(this, arguments);
         map._mandelbrotLayer = this;
         map.on('zoom', () => {
-            const zoom = map.getZoom();
-            this._renderer.clearJobs(job => job.message.zoom !== zoom);
+            const roundZoom = Math.round(map.getZoom());
+            this._renderer.clearJobs(job => job.message.zoom !== roundZoom);
         });
         map.fire('iterationschange', { value: this.options.iterations });
     },

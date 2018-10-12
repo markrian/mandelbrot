@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/markrian/mandelbrot.git"
   },
+  "scripts": {
+      "build": "rm -rf dist && mkdir dist && cp *.js *.css *.html dist"
+  },
   "keywords": [],
   "author": "Mark Florian <markrian@gmail.com>",
   "license": "ISC"

@@ -6,6 +6,9 @@
     / Use actual complex coords in URL
  - Prune pending jobs if they're out of bounds of the view (perhaps in
    getNextJob)
+    - Wow, I just can't figure this out. I've tried bounds checking the tiles,
+      but the wrong ones get pruned, either way I try to clear the jobs!
+      Something stupid is happening, clearly...
  - Add some optimizations (see wikipedia page)
     - e.g., bulb-checking, periodicity checking
  - Fix rendering with a non-default tileSize

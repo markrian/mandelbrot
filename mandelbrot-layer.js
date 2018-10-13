@@ -35,9 +35,37 @@ export default L.GridLayer.extend({
     onAdd(map) {
         L.GridLayer.prototype.onAdd.apply(this, arguments);
         map._mandelbrotLayer = this;
-        map.on('zoom', () => {
+        map.on('zoomend', () => {
             const roundZoom = Math.round(map.getZoom());
             this._renderer.clearJobs(job => job.message.zoom !== roundZoom);
+        });
+        map.on('moveend', () => {
+            const start = this._map._mandelbrotLayer._renderer._jobs.size;
+            const bounds = this._map.getBounds();
+            let lastRemoved;
+            this._renderer.clearJobs(job => {
+                const {
+                    realMin,
+                    imagMin,
+                    realMax,
+                    imagMax,
+                } = job.message.coords;
+                const jobBounds = L.latLngBounds(
+                    L.latLng(imagMax, realMax),
+                    L.latLng(imagMin, realMin),
+                );
+                const inBounds = bounds.overlaps(jobBounds);
+                if (!inBounds) {
+                    lastRemoved = {
+                        bounds,
+                        jobBounds,
+                        job,
+                    }
+                }
+                return inBounds;
+            });
+            const end = this._map._mandelbrotLayer._renderer._jobs.size;
+            console.log(`ditched ${start - end} out of ${start} jobs!`, lastRemoved);
         });
         map.fire('iterationschange', { value: this.options.iterations });
     },

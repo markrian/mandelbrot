@@ -87,6 +87,7 @@ export default L.GridLayer.extend({
 
         tile.dataset.x = coords.x;
         tile.dataset.y = coords.y;
+        tile.dataset.complexBounds = JSON.stringify(complexBounds);
 
         function jobToBounds(job) {
             const {

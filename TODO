@@ -9,6 +9,9 @@
     - Wow, I just can't figure this out. I've tried bounds checking the tiles,
       but the wrong ones get pruned, either way I try to clear the jobs!
       Something stupid is happening, clearly...
+      - Right, it seems to be that tiles are getting an inverted
+        y (latitude/imaginary) coordinates... But that doesn't explain why
+        *some* tiles were getting culled and others weren't?
  - Add some optimizations (see wikipedia page)
     - e.g., bulb-checking, periodicity checking
  - Fix rendering with a non-default tileSize

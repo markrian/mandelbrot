@@ -5,9 +5,14 @@ function receiveJob(event) {
     for (let i = 0; i < imageData.data.length; i += 4) {
         const x = (i / 4) % imageData.width;
         const y = Math.floor(i / (imageData.width * 4));
+
+        // Canvas pixel coordinates are inverted vertically compared to
+        // the traditional complex plane. Therefore the first pixel to be drawn
+        // if the top-left one, [0, 0], which corresponds to the minimum real
+        // value and the *maximum* imaginary value.
         const complex = {
             real: coords.realMin + (x / imageData.width) * (coords.realMax - coords.realMin),
-            imag: coords.imagMin + (y / imageData.height) * (coords.imagMax - coords.imagMin),
+            imag: coords.imagMax - (y / imageData.height) * (coords.imagMax - coords.imagMin),
         };
         const count = mandelbrot(complex, iterations);
         if (count === iterations) {

@@ -85,6 +85,9 @@ export default L.GridLayer.extend({
             imagMin: (coords.y + 1) * zoomFactor,
         };
 
+        tile.dataset.x = coords.x;
+        tile.dataset.y = coords.y;
+
         function jobToBounds(job) {
             const {
                 realMin,

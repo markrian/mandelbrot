@@ -57,9 +57,27 @@ export default L.GridLayer.extend({
             imagMax: (coords.y + 1) * zoomFactor,
         };
 
+        function jobToBounds(job) {
+            const {
+                realMin,
+                imagMin,
+                realMax,
+                imagMax,
+            } = job.message.coords;
+            const jobBounds = L.latLngBounds(
+                L.latLng(imagMin, realMin),
+                L.latLng(imagMax, realMax),
+            );
+            return jobBounds;
+        }
+
         this._renderer.getImageData(complexBounds, tileSize, this.options.iterations, coords.z)
-            .then(imageData => {
-                ctx.putImageData(imageData, 0, 0);
+            .then(obj => {
+                tile.addEventListener('click', event => {
+                    tile.style.outline = "1px solid red";
+                    console.log(obj.job.message.coords, jobToBounds(obj.job));
+                });
+                ctx.putImageData(obj.imageData, 0, 0);
                 done(null, tile);
             })
             .catch(error => {

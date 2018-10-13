@@ -46,3 +46,7 @@ body {
 .mandelbrot-iterations-fewer {
     font-size: 22px;
 }
+
+.leaflet-tile-container {
+    pointer-events: all !important;
+}

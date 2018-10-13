@@ -80,9 +80,9 @@ export default L.GridLayer.extend({
         const zoomFactor = Math.pow(2, -coords.z);
         const complexBounds = {
             realMin: coords.x * zoomFactor,
-            imagMax: coords.y * zoomFactor,
+            imagMax: -coords.y * zoomFactor,
             realMax: (coords.x + 1) * zoomFactor,
-            imagMin: (coords.y + 1) * zoomFactor,
+            imagMin: (-coords.y - 1) * zoomFactor,
         };
 
         tile.dataset.x = coords.x;

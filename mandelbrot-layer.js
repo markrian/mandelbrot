@@ -62,7 +62,7 @@ export default L.GridLayer.extend({
                         job,
                     }
                 }
-                return inBounds;
+                return !inBounds;
             });
             const end = this._map._mandelbrotLayer._renderer._jobs.size;
             console.log(`ditched ${start - end} out of ${start} jobs!`, lastRemoved);

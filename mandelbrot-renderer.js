@@ -57,14 +57,11 @@ export default class MandelbrotRenderer {
     }
 
     getNextJob() {
-        const jobs = [];
         for (const [id, job] of this._jobs) {
             if (!job.posted) {
-                jobs.push(job);
+                return job;
             }
         }
-        jobs.sort(highestIdFirst);
-        return jobs[0];
     }
 
     clearJobs(predicate) {

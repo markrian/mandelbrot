@@ -15,6 +15,5 @@ const map = L.map('fractal', {
 
 map.addLayer(new MandelbrotLayer({ tileSize }));
 map.mandelbrotHash.enable();
-map.mouseDebug.enable();
 
 window.map = map;

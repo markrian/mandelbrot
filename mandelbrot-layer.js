@@ -80,9 +80,9 @@ export default L.GridLayer.extend({
         const zoomFactor = Math.pow(2, -coords.z);
         const complexBounds = {
             realMin: coords.x * zoomFactor,
-            imagMin: coords.y * zoomFactor,
+            imagMax: coords.y * zoomFactor,
             realMax: (coords.x + 1) * zoomFactor,
-            imagMax: (coords.y + 1) * zoomFactor,
+            imagMin: (coords.y + 1) * zoomFactor,
         };
 
         function jobToBounds(job) {

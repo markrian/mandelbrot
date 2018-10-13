@@ -65,14 +65,4 @@ const Hash = L.Handler.extend({
     }
 });
 
-const MouseDebugHandler = L.Handler.extend({
-    addHooks() {
-        L.DomEvent.on(document, 'click', this._onMouse, this);
-    },
-    _onMouse(event) {
-        console.log(this._map.mouseEventToLatLng(event));
-    }
-});
-
 L.Map.addInitHook('addHandler', 'mandelbrotHash', Hash);
-L.Map.addInitHook('addHandler', 'mouseDebug', MouseDebugHandler);

@@ -64,7 +64,7 @@ export default L.GridLayer.extend({
         tile.height = tileSize.y;
         const ctx = tile.getContext('2d');
 
-        const tileBounds = this._tileCoordsToComplexBounds(coords, tileSize);
+        const tileBounds = this._tileCoordsToBounds(coords, tileSize);
         const complexBounds = {
             realMin: tileBounds.getWest(),
             imagMax: tileBounds.getNorth(),
@@ -85,7 +85,7 @@ export default L.GridLayer.extend({
         return tile;
     },
 
-    _tileCoordsToComplexBounds(coords, tileSize) {
+    _tileCoordsToBounds(coords, tileSize) {
         const point = L.point(coords.x, coords.y);
         let nw = point.scaleBy(tileSize);
         let se = nw.add(tileSize);

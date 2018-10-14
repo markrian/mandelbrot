@@ -49,7 +49,12 @@ const Hash = L.Handler.extend({
             return;
         }
 
-        const hash = event.newURL.slice(event.newURL.indexOf('#'));
+        const hashIndex = event.newURL.indexOf('#');
+        if (hashIndex === -1) {
+            return;
+        }
+
+        const hash = event.newURL.slice(hashIndex);
         const parts = this._hashToParts(hash);
         if (parts === undefined) {
             console.warn('Invalid hash. Expected something like: #0,0,1,64');

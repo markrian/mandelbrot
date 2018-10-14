@@ -40,7 +40,6 @@ export default L.GridLayer.extend({
             this._renderer.clearJobs(job => job.message.zoom !== roundZoom);
         });
         map.on('moveend', () => {
-            const bounds = this._map.getBounds();
             this._renderer.clearJobs(job => {
                 const {
                     realMin,
@@ -52,7 +51,7 @@ export default L.GridLayer.extend({
                     L.latLng(imagMax, realMax),
                     L.latLng(imagMin, realMin),
                 );
-                return !bounds.overlaps(jobBounds);
+                return !this._map.getBounds().overlaps(jobBounds);
             });
         });
         map.fire('iterationschange', { value: this.options.iterations });

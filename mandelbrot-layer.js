@@ -65,12 +65,12 @@ export default L.GridLayer.extend({
         tile.height = tileSize.y;
         const ctx = tile.getContext('2d');
 
-        const zoomFactor = Math.pow(2, -coords.z);
+        const tileBounds = this._tileCoordsToComplexBounds(coords, tileSize);
         const complexBounds = {
-            realMin: coords.x * zoomFactor,
-            imagMax: -coords.y * zoomFactor,
-            realMax: (coords.x + 1) * zoomFactor,
-            imagMin: -(coords.y + 1) * zoomFactor,
+            realMin: tileBounds.getWest(),
+            imagMax: tileBounds.getNorth(),
+            realMax: tileBounds.getEast(),
+            imagMin: tileBounds.getSouth(),
         };
 
         this._renderer.getImageData(complexBounds, tileSize, this.options.iterations, coords.z)
@@ -84,6 +84,15 @@ export default L.GridLayer.extend({
             });
 
         return tile;
+    },
+
+    _tileCoordsToComplexBounds(coords, tileSize) {
+        const point = L.point(coords.x, coords.y);
+        let nw = point.scaleBy(tileSize);
+        let se = nw.add(tileSize);
+        nw = this._map.unproject(nw, coords.z);
+        se = this._map.unproject(se, coords.z);
+        return L.latLngBounds(nw, se);
     },
 });
 

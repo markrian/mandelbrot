@@ -70,34 +70,12 @@ export default L.GridLayer.extend({
             realMin: coords.x * zoomFactor,
             imagMax: -coords.y * zoomFactor,
             realMax: (coords.x + 1) * zoomFactor,
-            imagMin: (-coords.y - 1) * zoomFactor,
+            imagMin: -(coords.y + 1) * zoomFactor,
         };
 
-        tile.dataset.x = coords.x;
-        tile.dataset.y = coords.y;
-        tile.dataset.complexBounds = JSON.stringify(complexBounds);
-
-        function jobToBounds(job) {
-            const {
-                realMin,
-                imagMin,
-                realMax,
-                imagMax,
-            } = job.message.coords;
-            const jobBounds = L.latLngBounds(
-                L.latLng(imagMin, realMin),
-                L.latLng(imagMax, realMax),
-            );
-            return jobBounds;
-        }
-
         this._renderer.getImageData(complexBounds, tileSize, this.options.iterations, coords.z)
-            .then(obj => {
-                tile.addEventListener('click', event => {
-                    tile.style.outline = "1px solid red";
-                    console.log(obj.job.message.coords, jobToBounds(obj.job));
-                });
-                ctx.putImageData(obj.imageData, 0, 0);
+            .then(imageData => {
+                ctx.putImageData(imageData, 0, 0);
                 done(null, tile);
             })
             .catch(error => {

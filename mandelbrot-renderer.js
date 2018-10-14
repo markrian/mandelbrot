@@ -45,7 +45,7 @@ export default class MandelbrotRenderer {
         // resolve deferred
         const job = this._jobs.get(event.data.id);
         if (job !== undefined) {
-            job.resolve({ imageData: event.data.imageData, job });
+            job.resolve(event.data.imageData);
             this._jobs.delete(event.data.id);
         }
 

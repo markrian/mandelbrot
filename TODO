@@ -4,12 +4,12 @@
     / Fix bug where it (sometimes? After reloading the page?) redraws
       unnecessarily after panning)
     / Use actual complex coords in URL
- - Prune pending jobs if they're out of bounds of the view (perhaps in
+ / Prune pending jobs if they're out of bounds of the view (perhaps in
    getNextJob)
-    - Wow, I just can't figure this out. I've tried bounds checking the tiles,
+    / Wow, I just can't figure this out. I've tried bounds checking the tiles,
       but the wrong ones get pruned, either way I try to clear the jobs!
       Something stupid is happening, clearly...
-      - Right, it seems to be that tiles are getting an inverted
+      / Right, it seems to be that tiles are getting an inverted
         y (latitude/imaginary) coordinates... But that doesn't explain why
         *some* tiles were getting culled and others weren't?
  - Add some optimizations (see wikipedia page)

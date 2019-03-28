@@ -49,6 +49,10 @@ function triangle(n, max) {
 }
 
 function mandelbrot(complex, max) {
+    if (inCardioid(complex) || inBulb(complex)) {
+        return max;
+    }
+
     let count = 0;
     let zr = 0;
     let zi = 0;
@@ -64,6 +68,19 @@ function mandelbrot(complex, max) {
     }
 
     return count;
+}
+
+// https://en.wikipedia.org/wiki/Mandelbrot_set#Cardioid_/_bulb_checking
+function inCardioid({ real: zr, imag: zi }) {
+  const zr_ = zr - .25;
+  const q = zr_ * zr_ + zi * zi;
+  const lhs = q * (q + zr_);
+  const rhs = .25 * zi * zi;
+  return lhs <= rhs;
+}
+
+function inBulb({ real: zr, imag: zi }) {
+  return (zr + 1) * (zr + 1) + zi * zi <= 1 / 16;
 }
 
 onmessage = receiveJob;

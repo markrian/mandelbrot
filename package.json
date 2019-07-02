@@ -8,7 +8,7 @@
     "url": "https://github.com/markrian/mandelbrot.git"
   },
   "scripts": {
-    "build": "rm -rf dist && mkdir dist && cp *.js *.css *.html dist && cp node_modules/leaflet/dist/leaflet.*s dist"
+    "build": "rm -rf dist && mkdir dist && cp node_modules/leaflet/dist/leaflet.*s dist && cp *.js *.html dist"
   },
   "keywords": [],
   "author": "Mark Florian <markrian@gmail.com>",

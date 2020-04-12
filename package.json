@@ -14,6 +14,6 @@
   "author": "Mark Florian <markrian@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "leaflet": "^1.4.0"
+    "leaflet": "1.x"
   }
 }

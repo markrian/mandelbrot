@@ -1,5 +1,5 @@
 pages:
-  images: node:14-alpine
+  image: node:14-alpine
   stage: deploy
   script:
     - npm install

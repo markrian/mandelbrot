@@ -1,0 +1,14 @@
+pages:
+  images: node:14-alpine
+  stage: deploy
+  script:
+    - npm install
+    - npm run build
+    - rm -rf public
+    - mv dist public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+

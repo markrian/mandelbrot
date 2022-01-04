@@ -1,5 +1,6 @@
 import L from './leaflet-shim.js';
 import MandelbrotRenderer from './mandelbrot-renderer.js';
+import { devicePixelRatio } from './util.js';
 
 export default L.GridLayer.extend({
     options: {
@@ -59,12 +60,14 @@ export default L.GridLayer.extend({
 
     createTile(coords, done) {
         const tileSize = this.getTileSize();
+        const renderedTileSize = tileSize.multiplyBy(devicePixelRatio);
+
         const tile = document.createElement('canvas');
-        tile.width = tileSize.x;
-        tile.height = tileSize.y;
-        const ctx = tile.getContext('2d');
+        tile.width = renderedTileSize.x;
+        tile.height = renderedTileSize.y;
 
         const tileBounds = this._tileCoordsToBounds(coords, tileSize);
+
         const complexBounds = {
             realMin: tileBounds.getWest(),
             imagMax: tileBounds.getNorth(),
@@ -72,9 +75,9 @@ export default L.GridLayer.extend({
             imagMin: tileBounds.getSouth(),
         };
 
-        this._renderer.getImageData(complexBounds, tileSize, this.options.iterations, coords.z)
+        this._renderer.getImageData(complexBounds, renderedTileSize, this.options.iterations, coords.z)
             .then(imageData => {
-                ctx.putImageData(imageData, 0, 0);
+                tile.getContext('2d').putImageData(imageData, 0, 0);
                 done(null, tile);
             })
             .catch(error => {

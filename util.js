@@ -17,3 +17,5 @@ export function fadeOut(element) {
 
     element.classList.add('transparent');
 }
+
+export const devicePixelRatio = Number.isFinite(window.devicePixelRatio) ? window.devicePixelRatio : 1;
